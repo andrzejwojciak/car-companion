@@ -1,0 +1,8 @@
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/bin/Debug/appsettings.Development.json
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/bin/Debug/appsettings.json
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/bin/Debug/Properties/launchSettings.json
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/bin/Debug/carcompanion.dll
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/bin/Debug/carcompanion.pdb
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/obj/Debug/docker-compose.dcprojAssemblyReference.cache
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/obj/Debug/docker-compose.dcproj.CoreCompileInputs.cache
+/Users/mateuszlesniara/Desktop/carbackend/carcompanionbackend/carcompanion/obj/Debug/docker-compose.dcproj.CopyComplete

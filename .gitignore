@@ -233,8 +233,8 @@ _Pvt_Extensions
 
 # VSCODE 
 .vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
+*/.vscode/settings.json
+*/.vscode/tasks.json
+*/.vscode/launch.json
+*/.vscode/extensions.json
 *.code-workspace

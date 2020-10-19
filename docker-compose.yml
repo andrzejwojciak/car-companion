@@ -1,0 +1,22 @@
+version: '3.8'
+
+services: 
+    mssql-server:
+        image: mcr.microsoft.com/mssql/server:2019-CU8-ubuntu-16.04
+        environment: 
+            ACCEPT_EULA: "Y"
+            SA_PASSWORD: "Str@ngPassword2020!"
+            MSSQL_PID: "Express"
+        ports: 
+            - "11433:1433"
+    
+    carcompanion-api:
+        build: 
+            context: ./carcompanion 
+            dockerfile: Dockerfile
+        ports: 
+            - "8080:80"
+        depends_on:
+            - mssql-server
+        environment: 
+            ConnectionStrings:Database: "Server= mssql-server; Database=CarcompanionDB; User=SA; Password=Str@ngPassword2020!"

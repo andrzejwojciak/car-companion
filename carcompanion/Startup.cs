@@ -1,5 +1,7 @@
 using AutoMapper;
 using carcompanion.Data;
+using carcompanion.Services;
+using carcompanion.Services.Interfaces;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -27,6 +29,7 @@ namespace carcompanion
             services.AddAutoMapper(typeof(Startup));
             services.AddControllers();
             services.AddSwaggerGen();
+            services.AddScoped<ICarService, CarService>();
             
             services.AddCors(options =>
             {

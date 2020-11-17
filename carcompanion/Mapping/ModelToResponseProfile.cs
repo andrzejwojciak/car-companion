@@ -8,7 +8,8 @@ namespace carcompanion.Mapping
     {
         public ModelToResponseProfile()
         {
-            CreateMap<Test, CreateTestResponse>();
+            CreateMap<Car, CreateCarResponse>();
+            CreateMap<Car, GetCarByIdResponse>();
         }
     }
 }

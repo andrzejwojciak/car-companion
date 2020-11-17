@@ -8,8 +8,7 @@ namespace carcompanion.Mapping
     {
         public RequestToModelProfile()
         {
-            CreateMap<CreateTestRequest, Test>();
-            CreateMap<UpdateTestRequest, Test>();
+            CreateMap<CreateCarRequest, Car>();
         }
     }
 }

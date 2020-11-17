@@ -34,7 +34,7 @@ namespace carcompanion
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Waiting for database ready");
+                    Console.WriteLine("Something went wrong, trying again");
                     DbReadyToGo = false;
                     Thread.Sleep(4000);
                 }

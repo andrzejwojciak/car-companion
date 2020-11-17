@@ -1,5 +1,5 @@
-using carcompanion.Models;
 using Microsoft.EntityFrameworkCore;
+using carcompanion.Models;
 
 namespace carcompanion.Data
 {
@@ -9,7 +9,7 @@ namespace carcompanion.Data
             : base(options)
         { }
 
-        public DbSet<Test> Tests { get; set; }
+        public DbSet<Car> Cars { get; set; }
         
     }
 }

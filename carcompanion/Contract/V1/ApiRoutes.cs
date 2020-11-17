@@ -7,13 +7,10 @@ namespace carcompanion.Contract.V1
         private const  string Version = "v1";
         private const  string Base = Root + "/" + Version;
 
-        public static class Tests
-        {             
-            public const string GetAll = Base + "/tests";      
-            public const string Create = Base + "/tests";
-            public const string GetTestById = Base + "/tests/{id}";
-            public const string Delete = Base + "/tests/{id}";
-            public const string Update = Base + "/tests/{id}";
+        public static class Cars
+        {
+            public const string Create = Base + "/cars";            
+            public const string GetById = Base + "/cars/{carId}";
         }
         
     }

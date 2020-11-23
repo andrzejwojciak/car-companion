@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace carcompanion.Models
@@ -20,6 +21,8 @@ namespace carcompanion.Models
         public int Mileage { get; set; }        
         public int ProductionYear { get; set; }             
         public DateTime AddedDate { get; set; }
+
+        public ICollection<Expense> Expenses { get; set; }
         
         
         

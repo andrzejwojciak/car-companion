@@ -8,5 +8,6 @@ namespace carcompanion.Services.Interfaces
     {       
         Task<bool> CreateCarAsync(Car carModel);  
         Task<Car> GetCarByIdAsync(Guid carId);
+        Task<Car> GetCarWithExpesnesByIdAsync(Guid carId);
     }
 }

@@ -10,6 +10,9 @@ namespace carcompanion.Mapping
         {
             CreateMap<Car, CreateCarResponse>();
             CreateMap<Car, GetCarByIdResponse>();
+
+            CreateMap<Expense, GetCarExpensesResponse>();
+            CreateMap<Expense, CreateExpenseResponse>();
         }
     }
 }

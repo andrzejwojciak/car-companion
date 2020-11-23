@@ -9,6 +9,7 @@ namespace carcompanion.Mapping
         public RequestToModelProfile()
         {
             CreateMap<CreateCarRequest, Car>();
+            CreateMap<CreateExpenseRequest, Expense>();
         }
     }
 }

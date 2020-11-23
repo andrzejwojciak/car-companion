@@ -30,6 +30,7 @@ namespace carcompanion
             services.AddControllers();
             services.AddSwaggerGen();
             services.AddScoped<ICarService, CarService>();
+            services.AddScoped<IExpenseService, ExpenseService>();
             
             services.AddCors(options =>
             {

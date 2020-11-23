@@ -26,21 +26,28 @@ namespace carcompanion.Services
 
             _context.Cars.Add(carModel);
 
-            if(await _context.SaveChangesAsync() > 0)
-                return true;
-
-            return false;
+            var added = await _context.SaveChangesAsync();
+            return added > 0 ? true : false;
         }
 
-        public async Task<Car> GetCarByIdAsync(Guid carId)
+        public async Task<Car> GetCarByIdAsync(Guid carId) 
         {
             var car = await _context.Cars.FirstOrDefaultAsync(x => x.CarId == carId);
             return car;
         }
 
+        public async Task<Car> GetCarWithExpesnesByIdAsync(Guid carId)
+        {
+            var car = await _context.Cars
+                                .Include(x => x.Expenses)
+                                .FirstOrDefaultAsync(x => x.CarId == carId);
+
+            return car;
+        }
+
         private void GenerateMainName(Car carModel)
         {
-            carModel.MainName = carModel.Brand + " " + carModel.Model;
+            carModel.MainName = carModel.Brand + "-" + carModel.Model;
         }
     }
 }

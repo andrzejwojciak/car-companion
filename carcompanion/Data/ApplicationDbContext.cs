@@ -9,19 +9,34 @@ namespace carcompanion.Data
             : base(options)
         { }
 
-        
+        public DbSet<User> Users { get; set; }
+        public DbSet<UserCar> UserCars { get; set; }
         public DbSet<Car> Cars { get; set; }
         public DbSet<Expense> Expenses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-{
+        {
             modelBuilder.Entity<Car>()
                 .HasMany(c => c.Expenses)
                 .WithOne(e => e.Car);
             
+            modelBuilder.Entity<UserCar>()
+                .HasOne(u => u.User)                     
+                .WithMany(u => u.UserCars)
+                .HasForeignKey(i => i.UserId);
+                            
+            modelBuilder.Entity<UserCar>()
+                .HasOne(u => u.Car)                     
+                .WithMany(u => u.UserCars)
+                .HasForeignKey(i => i.CarId);
+                
+            modelBuilder.Entity<UserCar>()
+                .HasKey(uc => new { uc.CarId, uc.UserId});            
+            
             modelBuilder.Entity<Expense>()
                 .Property(p => p.Amount)
                 .HasColumnType("decimal(18,2)");
+
         }
         
     }

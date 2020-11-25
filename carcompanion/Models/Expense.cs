@@ -10,6 +10,7 @@ namespace carcompanion.Models
         }
 
         public Guid ExpenseId { get; set; }
+        public string Description { get; set; }
         public decimal Amount { get; set; }
         public int MileageInterval { get; set; }        
         public DateTime EndOfDateInterval { get; set; }        

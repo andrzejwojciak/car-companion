@@ -41,9 +41,10 @@ namespace carcompanion
             services.AddScoped<ICarService, CarService>();
             services.AddScoped<IExpenseService, ExpenseService>();
             services.AddScoped<IUserService, UserService>();
+            
+            services.AddScoped<IJwtManager, JwtManager>();
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
-            services.AddSingleton<IJwtManager, JwtManager>();
             
             
             services.AddAutoMapper(typeof(Startup));      

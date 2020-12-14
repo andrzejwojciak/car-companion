@@ -37,13 +37,8 @@ namespace carcompanion.Controllers.Security
             
             if(!_userService.IsPasswordMatch(user, request.Password))
                 return BadRequest("Login or password is wrong.");
-
-            var response = new AuthSuccessResponse
-            {
-                JwtToken = _jwtManager.GenerateToken(user)
-            };
-
-            return Ok(response);
+            
+            return AuthenticateUser(user);
         }
 
         [AllowAnonymous]
@@ -57,15 +52,11 @@ namespace carcompanion.Controllers.Security
 
             if(!await _userService.RegisterUserAsync(newUser))
                 return BadRequest("Something went wrong!");
-
-            var response = new AuthSuccessResponse
-            {
-                JwtToken = _jwtManager.GenerateToken(newUser)
-            };
-
-            return Ok(response);
+            
+            return AuthenticateUser(newUser);
         }
 
+        [AllowAnonymous]
         [HttpPost(Auth.Refresh)]
         public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
         {
@@ -76,6 +67,22 @@ namespace carcompanion.Controllers.Security
         public IActionResult Logout()
         {
             return Ok("Logged out!");
+        }
+
+        private IActionResult AuthenticateUser(User user)
+        {
+            var authResult = _jwtManager.AuthenticateUser(user);
+
+            if(!authResult.Success)
+                return Unauthorized();
+
+            var response = new AuthSuccessResponse
+            {
+                AccessToken = authResult.AccessToken,
+                RefreshToken = authResult.RefreshToken
+            };
+
+            return Ok(response);
         }
 
     }

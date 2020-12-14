@@ -9,7 +9,7 @@ namespace carcompanion.Security
 {
     public interface IJwtManager
     {
-        string GenerateToken(User user);
+        AuthenticationResult AuthenticateUser(User user);
         
     }
 
@@ -22,7 +22,22 @@ namespace carcompanion.Security
             _jwtSettings = jwtSettings;
         }
 
-        public string GenerateToken(User user)
+        public AuthenticationResult AuthenticateUser(User user)
+        {
+            var newAccessToken = GenerateAccessToken(user);
+            var newRefreshToken = GenerateRefreshToken(newAccessToken);
+
+            var authResult = new AuthenticationResult
+            {
+                Success = true,
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+
+            return authResult;
+        }
+
+        private string GenerateAccessToken(User user)
         {
             var key = Encoding.ASCII.GetBytes(_jwtSettings.SigningKey);            
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -46,6 +61,11 @@ namespace carcompanion.Security
 
             return tokenHandler.WriteToken(token);
 
+        }
+
+        private string GenerateRefreshToken(string AccessToken)
+        {
+            return "";
         }
     }
 }

@@ -45,9 +45,10 @@ namespace carcompanion
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
             services.AddSingleton<IJwtManager, JwtManager>();
             
-            services.AddControllers();
             
             services.AddAutoMapper(typeof(Startup));      
+            
+            services.AddControllers();
             
             services.AddAuthentication(x =>
                 {
@@ -59,31 +60,31 @@ namespace carcompanion
                       x.SaveToken = true;
                       x.TokenValidationParameters = new TokenValidationParameters
                       {
-                            ValidateIssuer = true,
-                            ValidIssuer = jwtSettings.Issuer,
                             ValidateIssuerSigningKey = true,
                             IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtSettings.SigningKey)),
-                            ValidateAudience = false,                            
+                            ValidateIssuer = true,                      
+                            ValidIssuer = jwtSettings.Issuer,
+                            ValidateAudience = false,      
                             ValidateLifetime = true,
-                            ClockSkew = TimeSpan.Zero      
+                            RequireExpirationTime = false,
+                            ClockSkew = TimeSpan.Zero    
                       };
                   });            
+                  
             
             services.AddCors(options =>
             {
                 options.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.AllowAnyOrigin()
-                            .AllowAnyHeader()
-                            .AllowAnyMethod();
+                        builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                     });
             });    
 
                   
              services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Animal Shelter Api", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "carcompanion-backend", Version = "v1" });
                 
                 c.AddSecurityDefinition("Bearer", 
                     new OpenApiSecurityScheme{
@@ -108,28 +109,28 @@ namespace carcompanion
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {            
-            app.UseCors();
+        {   
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
             
             app.UseSwagger();
-
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "Carcompanion API V1");
                 c.RoutePrefix = string.Empty;
             });
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
+            
+            app.UseCors();
 
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthorization();            
+   
             app.UseAuthentication();
+            app.UseAuthorization();         
 
             app.UseEndpoints(endpoints =>
             {

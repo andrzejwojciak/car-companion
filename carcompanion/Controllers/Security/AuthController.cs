@@ -1,12 +1,13 @@
-using AutoMapper;
-using carcompanion.Security;
+using System.Threading.Tasks;
 using carcompanion.Contract.Security.Requests;
-using carcompanion.Services.Interfaces;
-using Microsoft.AspNetCore.Authorization;
+using carcompanion.Contract.Security.Responses;
+using carcompanion.Models;
+using carcompanion.Security;
 using Microsoft.AspNetCore.Mvc;
 using static carcompanion.Contract.Security.ApiRoutes;
-using System.Threading.Tasks;
-using carcompanion.Models;
+using AutoMapper;
+using carcompanion.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace carcompanion.Controllers.Security
 {
@@ -37,7 +38,12 @@ namespace carcompanion.Controllers.Security
             if(!_userService.IsPasswordMatch(user, request.Password))
                 return BadRequest("Login or password is wrong.");
 
-            return Ok("Login succes!");
+            var response = new AuthSuccessResponse
+            {
+                JwtToken = _jwtManager.GenerateToken(user)
+            };
+
+            return Ok(response);
         }
 
         [AllowAnonymous]
@@ -52,19 +58,24 @@ namespace carcompanion.Controllers.Security
             if(!await _userService.RegisterUserAsync(newUser))
                 return BadRequest("Something went wrong!");
 
-            return Ok(newUser.UserId);
+            var response = new AuthSuccessResponse
+            {
+                JwtToken = _jwtManager.GenerateToken(newUser)
+            };
+
+            return Ok(response);
         }
 
         [HttpPost(Auth.Refresh)]
         public IActionResult RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            return Ok("Refresh!");
+            return Ok("Refreshed!");
         }        
 
-        [HttpPost(Auth.Refresh)]
+        [HttpPost(Auth.Logout)]
         public IActionResult Logout()
         {
-            return Ok("Logout!");
+            return Ok("Logged out!");
         }
 
     }

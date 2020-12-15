@@ -2,6 +2,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using carcompanion.Data;
 using carcompanion.Models;
+using carcompanion.Security;
 using carcompanion.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +11,11 @@ namespace carcompanion.Services
     public class UserService : IUserService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IPasswordHasher _hasher;
 
-        public UserService(ApplicationDbContext context)
+        public UserService(ApplicationDbContext context, IPasswordHasher hasher)
         {
+            _hasher = hasher;
             _context = context;
         }
 
@@ -24,6 +27,7 @@ namespace carcompanion.Services
 
         public async Task<bool> RegisterUserAsync(User newUser)
         {
+            newUser.Password = _hasher.HashPassword(newUser.Password);
             await _context.Users.AddAsync(newUser);
             return await _context.SaveChangesAsync() > 0 ? true : false;
         }
@@ -33,7 +37,10 @@ namespace carcompanion.Services
             return await _context.Users.AnyAsync(e => e.Email == email);
         }
 
-        public bool IsPasswordMatch(User user, string password) => user.Password.Equals(password) ? true : false;
+        public bool IsPasswordMatch(User user, string password)
+        {
+            return _hasher.VerifyHashedUserPassword(user.Password, password);
+        } 
         
     }
 }

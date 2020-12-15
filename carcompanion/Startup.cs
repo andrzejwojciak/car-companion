@@ -37,17 +37,6 @@ namespace carcompanion
             
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Database")));
-                
-            services.AddScoped<ICarService, CarService>();
-            services.AddScoped<IExpenseService, ExpenseService>();
-            services.AddScoped<IUserService, UserService>();
-            
-            services.AddScoped<IJwtManager, JwtManager>();
-
-            services.AddSingleton<IPasswordHasher, PasswordHasher>();
-            
-            
-            services.AddAutoMapper(typeof(Startup));      
             
             services.AddControllers();
             
@@ -81,7 +70,6 @@ namespace carcompanion
                         builder.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod();
                     });
             });    
-
                   
              services.AddSwaggerGen(c =>
             {
@@ -105,7 +93,17 @@ namespace carcompanion
                         },new List<string>()
                     }
                 });
-            });
+            });   
+
+            services.AddAutoMapper(typeof(Startup));                
+                
+            services.AddScoped<ICarService, CarService>();
+            services.AddScoped<IExpenseService, ExpenseService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRefreshtokenService, RefreshtokenService>();
+            services.AddScoped<IJwtManager, JwtManager>();
+            
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();           
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

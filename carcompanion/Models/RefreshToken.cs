@@ -7,6 +7,7 @@ namespace carcompanion.Models
     {
         public RefreshToken()
         {
+            Used = false;
             CreatedDate = DateTime.Now;
         }
 
@@ -16,6 +17,7 @@ namespace carcompanion.Models
         public Guid UserId { get; set; }
         public DateTime ExpirationDate { get; set; }
         public DateTime CreatedDate { get; set; }
+        public bool Used { get; set; }
         
     }
 }

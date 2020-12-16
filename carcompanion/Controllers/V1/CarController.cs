@@ -27,7 +27,7 @@ namespace carcompanion.Controllers.V1
             _mapper = mapper;
         }
         
-        [HttpPost(Cars.Create)]
+        [HttpPost(Cars.CreateCar)]
         public async Task<ActionResult> Create(CreateCarRequest request)
         {
             var carModel = _mapper.Map<Car>(request);
@@ -39,15 +39,49 @@ namespace carcompanion.Controllers.V1
             return BadRequest();
         }
 
-        [HttpGet(Cars.GetById)]
+        [HttpGet(Cars.GetCarById)]
         public async Task<ActionResult> GetCarById([FromRoute] Guid carId)
         { 
-            var carModel = await _carService.GetCarByIdAsync(carId);
+            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
 
-            if(carModel == null)
+            if(car == null)
                 return BadRequest("Something went wrong!");
 
-            return Ok(_mapper.Map<GetCarByIdResponse>(carModel));
+            return Ok(_mapper.Map<GetCarByIdResponse>(car));
+        }
+
+        [HttpPatch(Cars.PatchCar)]
+        public async Task<ActionResult> PatchCar([FromRoute] Guid carId, [FromBody] PatchCarRequest request)
+        {
+            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+
+            if(car == null)
+                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
+
+            _mapper.Map(request, car);
+            var updateSuccess = await _carService.UpdateCarAsync(car);
+            
+            if(!updateSuccess)
+                return BadRequest();
+
+            return Ok(_mapper.Map<GetCarByIdResponse>(car));
+        }
+
+        [HttpPut(Cars.PutCar)]
+        public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
+        {
+            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+
+            if(car == null)
+                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
+
+            _mapper.Map(request, car);
+            var updateSuccess = await _carService.UpdateCarAsync(car);
+            
+            if(!updateSuccess)
+                return BadRequest();
+
+            return Ok(_mapper.Map<GetCarByIdResponse>(car));
         }
 
         [HttpGet(Cars.GetUserCars)]

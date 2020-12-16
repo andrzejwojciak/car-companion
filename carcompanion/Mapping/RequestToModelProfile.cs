@@ -9,9 +9,16 @@ namespace carcompanion.Mapping
     {
         public RequestToModelProfile()
         {
-            CreateMap<CreateCarRequest, Car>();
+            CreateMap<CreateCarRequest, Car>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
             CreateMap<CreateExpenseRequest, Expense>();
-    
+            
+            CreateMap<PatchCarRequest, Car>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => (srcMember != null) && !srcMember.Equals(0)));
+                
+            CreateMap<PutCarRequest, Car>();
+                
             //security
             CreateMap<RegisterRequest, User>();
         }

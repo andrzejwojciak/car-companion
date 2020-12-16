@@ -6,14 +6,17 @@ using System.Threading.Tasks;
 using AutoMapper;
 using carcompanion.Contract.V1.Requests;
 using carcompanion.Contract.V1.Responses;
+using carcompanion.Extensions;
 using carcompanion.Models;
 using carcompanion.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static carcompanion.Contract.V1.ApiRoutes;
 
 namespace carcompanion.Controllers.V1
 {
+    [Authorize]
     [ApiController]
     public class ExpenseController : ControllerBase
     {
@@ -28,7 +31,7 @@ namespace carcompanion.Controllers.V1
             _mapper = mapper;            
         }
         
-
+        //TODO: Need to be fixed
         [HttpGet(Expenses.GetCarExpesnes)]
         public async Task<ActionResult> GetCarExpenses([FromRoute] Guid carId)
         {
@@ -47,7 +50,7 @@ namespace carcompanion.Controllers.V1
         [HttpPost(Expenses.CreateCarExpense)]
         public async Task<ActionResult> CreateCarExpenses([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
         {
-            var car = await _carService.GetCarByIdAsync(carId);
+            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
 
             if(car == null)
                 return NotFound($"Car {carId} doesn't exist");

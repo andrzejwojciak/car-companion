@@ -4,9 +4,8 @@ using carcompanion.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace carcompanion.Services
 {
@@ -19,12 +18,16 @@ namespace carcompanion.Services
             _context = context;
         }
 
-        public async Task<bool> CreateCarAsync(Car carModel)
+        public async Task<bool> CreateCarAsync(Car carModel, string userId)
         {
             if(carModel.MainName == null)
                 GenerateMainName(carModel);
 
             _context.Cars.Add(carModel);
+
+            var userCar = new UserCar{ UserId = Guid.Parse(userId), CarId = carModel.CarId };
+            
+            _context.UserCars.Add(userCar);
 
             var added = await _context.SaveChangesAsync();
             return added > 0 ? true : false;
@@ -34,6 +37,15 @@ namespace carcompanion.Services
         {
             var car = await _context.Cars.FirstOrDefaultAsync(x => x.CarId == carId);
             return car;
+        }
+
+        public async Task<IEnumerable<UserCar>> GetUserCarsAsync(string userIdString)
+        {
+            var userId = Guid.Parse(userIdString);
+            
+            var userCars = await _context.UserCars.Where(u => u.UserId == userId).Include(c => c.Car).ToListAsync();      
+                        
+            return userCars;
         }
 
         public async Task<Car> GetCarWithExpesnesByIdAsync(Guid carId)

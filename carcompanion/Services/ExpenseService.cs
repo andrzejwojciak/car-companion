@@ -16,8 +16,7 @@ namespace carcompanion.Services
 
         public ExpenseService(ApplicationDbContext context)
         {
-            _context = context;
-            
+            _context = context;            
         }
 
         public async Task<bool> AddExpenseAsync(Car car, Expense newExpense)

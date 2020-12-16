@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using AutoMapper;
 using carcompanion.Data;
@@ -39,7 +40,8 @@ namespace carcompanion
                 options.UseSqlServer(Configuration.GetConnectionString("Database")));
             
             services.AddControllers();
-            
+                        
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             services.AddAuthentication(x =>
                 {
                     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

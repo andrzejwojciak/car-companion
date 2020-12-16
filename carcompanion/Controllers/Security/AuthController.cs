@@ -32,13 +32,14 @@ namespace carcompanion.Controllers.Security
         [HttpPost(Auth.Login)]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
+            //TODO: Get AuthenticationResult from _userUservice
             var user = await _userService.GetUserByEmailAsync(request.Email);
-
+            
             if(user == null)
-                return NotFound("User doesn't exist");
+                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "Login or password is wrong."  });
             
             if(!_userService.IsPasswordMatch(user, request.Password))
-                return BadRequest("Login or password is wrong.");
+                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "Login or password is wrong." });
             
             return await AuthenticateUser(user);
         }
@@ -47,13 +48,14 @@ namespace carcompanion.Controllers.Security
         [HttpPost(Auth.Register)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {            
+            //TODO: Get AuthenticationResult from _userUservice
             if(await _userService.UserExistsByEmailAsync(request.Email))
-                return BadRequest("User already exists!");
+                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "User already exists" });
             
             var newUser = _mapper.Map<User>(request);
             
             if(!await _userService.RegisterUserAsync(newUser))
-                return BadRequest("Something went wrong!");
+                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "Something went wrong" });
             
             return await AuthenticateUser(newUser);
         }
@@ -71,11 +73,11 @@ namespace carcompanion.Controllers.Security
         }        
 
         [HttpPost(Auth.Logout)]
-        public async Task<IActionResult> Logout()
+        public IActionResult Logout()
         {
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            //TODO: Validate request and destroy refresh token
 
-            return Ok("TODO");
+            return Ok("Work in progress...");
         }
 
         private async Task<IActionResult> AuthenticateUser(User user)

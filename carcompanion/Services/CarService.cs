@@ -18,14 +18,14 @@ namespace carcompanion.Services
             _context = context;
         }
 
-        public async Task<bool> CreateCarAsync(Car carModel, string userId)
+        public async Task<bool> CreateCarAsync(Car carModel, Guid userId)
         {
             if(carModel.MainName == null)
                 GenerateMainName(carModel);
 
             _context.Cars.Add(carModel);
 
-            var userCar = new UserCar{ UserId = Guid.Parse(userId), CarId = carModel.CarId };
+            var userCar = new UserCar{ UserId = userId, CarId = carModel.CarId };
             
             _context.UserCars.Add(userCar);
 
@@ -50,12 +50,9 @@ namespace carcompanion.Services
             return car;
         }
 
-        public async Task<IEnumerable<UserCar>> GetUserCarsAsync(string userIdString)
-        {
-            var userId = Guid.Parse(userIdString);
-            
-            var userCars = await _context.UserCars.Where(u => u.UserId == userId).Include(c => c.Car).ToListAsync();      
-                        
+        public async Task<IEnumerable<UserCar>> GetUserCarsAsync(Guid userId)
+        {            
+            var userCars = await _context.UserCars.Where(u => u.UserId == userId).Include(c => c.Car).ToListAsync();     
             return userCars;
         }
 

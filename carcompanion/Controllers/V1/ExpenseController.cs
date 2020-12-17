@@ -50,7 +50,7 @@ namespace carcompanion.Controllers.V1
         [HttpPost(Expenses.CreateCarExpense)]
         public async Task<ActionResult> CreateCarExpenses([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
         {
-            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
 
             if(car == null)
                 return NotFound($"Car {carId} doesn't exist");

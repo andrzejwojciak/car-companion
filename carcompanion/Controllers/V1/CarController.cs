@@ -42,7 +42,7 @@ namespace carcompanion.Controllers.V1
         [HttpGet(Cars.GetCarById)]
         public async Task<ActionResult> GetCarById([FromRoute] Guid carId)
         { 
-            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
 
             if(car == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
@@ -53,7 +53,7 @@ namespace carcompanion.Controllers.V1
         [HttpPatch(Cars.PatchCar)]
         public async Task<ActionResult> PatchCar([FromRoute] Guid carId, [FromBody] PatchCarRequest request)
         {
-            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
 
             if(car == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
@@ -70,7 +70,7 @@ namespace carcompanion.Controllers.V1
         [HttpPut(Cars.PutCar)]
         public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
         {
-            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
 
             if(car == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
@@ -88,7 +88,7 @@ namespace carcompanion.Controllers.V1
         public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
         {
             
-            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
 
             if(car == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
@@ -112,7 +112,7 @@ namespace carcompanion.Controllers.V1
                 return NotFound( new {ErrorMessage = "User doesn't have any cars"});
             
             var carsResponse = _mapper.Map<IEnumerable<GetCarByIdResponse>>(cars);
-            return Ok(new GetUserCarsResponse{ UserId = userId, Cars = carsResponse });
+            return Ok(new GetUserCarsResponse{ UserId = userId.ToString(), Cars = carsResponse });
         }
 
     }

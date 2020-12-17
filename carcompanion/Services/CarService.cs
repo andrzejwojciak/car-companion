@@ -33,15 +33,14 @@ namespace carcompanion.Services
             return added > 0 ? true : false;
         }
 
-        public async Task<Car> GetUserCarByIdAsync(Guid userId, Guid carId)
+        public async Task<UserCar> GetUserCarByIdsAsync(Guid userId, Guid carId)
         {
-            var hasUserCar = await _context.UserCars.FirstOrDefaultAsync(x => x.UserId == userId && x.CarId == carId);
-            if(hasUserCar == null)
-                return null;
+            var hasUserCar = await _context.UserCars
+                    .Include(u => u.User)
+                    .Include(u => u.Car)
+                    .FirstOrDefaultAsync(x => x.UserId == userId && x.CarId == carId);
             
-            var car = await GetCarByIdAsync(carId);
-
-            return car;
+            return hasUserCar;
         }
 
         public async Task<Car> GetCarByIdAsync(Guid carId) 

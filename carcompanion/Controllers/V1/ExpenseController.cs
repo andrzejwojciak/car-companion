@@ -30,6 +30,22 @@ namespace carcompanion.Controllers.V1
             _expenseService = expenseService;
             _mapper = mapper;            
         }
+
+        [HttpGet(Expenses.GetCarExpenseById)]
+        public async Task<ActionResult> GetCarExpenseById([FromRoute] Guid carId, Guid expenseId)
+        {
+            var expense = await _expenseService.GetExpenseById(expenseId);
+            
+            if(expense == null)
+                return NotFound( new { errorMessage = "Expense doesn't exist" });
+
+            if(expense.Car.CarId != carId)
+                return BadRequest( new { errorMessage = "Car doesn't have that expense" });
+
+            var response = _mapper.Map<GetCarExpensesResponse>(expense);
+
+            return Ok(_mapper.Map<GetCarExpensesResponse>(expense));
+        }
         
         //TODO: Need to be fixed
         [HttpGet(Expenses.GetCarExpesnes)]
@@ -48,21 +64,23 @@ namespace carcompanion.Controllers.V1
         }
 
         [HttpPost(Expenses.CreateCarExpense)]
-        public async Task<ActionResult> CreateCarExpenses([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
+        public async Task<ActionResult> CreateCarExpense([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
         {
-            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
+            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
 
-            if(car == null)
-                return NotFound($"Car {carId} doesn't exist");
+            if(userCar.Car == null)
+                return NotFound( new { errorMessage = $"Car {carId} doesn't exist or user doesn't have that car" });
             
             var newExpense = _mapper.Map<Expense>(request);
-            
-            var added = await _expenseService.AddExpenseAsync(car, newExpense);
+
+            var added = await _expenseService.AddExpenseAsync(userCar.User, userCar.Car, newExpense);
 
             if(added == false)
                 return BadRequest();
 
-            return Ok(_mapper.Map<CreateExpenseResponse>(newExpense));
+            var response = _mapper.Map<CreateExpenseResponse>(newExpense);
+
+            return Ok(response);
         }
     }
 }

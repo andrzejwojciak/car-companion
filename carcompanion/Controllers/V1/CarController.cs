@@ -30,11 +30,11 @@ namespace carcompanion.Controllers.V1
         [HttpPost(Cars.CreateCar)]
         public async Task<ActionResult> Create(CreateCarRequest request)
         {
-            var carModel = _mapper.Map<Car>(request);
-            var created = await _carService.CreateCarAsync(carModel, HttpContext.GetUserId());
+            var car = _mapper.Map<Car>(request);
+            var created = await _carService.CreateCarAsync(car, HttpContext.GetUserId());
 
             if(created)
-                return Ok(_mapper.Map<CreateCarResponse>(carModel));
+                return Ok(_mapper.Map<CreateCarResponse>(car));
                 
             return BadRequest();
         }
@@ -42,58 +42,58 @@ namespace carcompanion.Controllers.V1
         [HttpGet(Cars.GetCarById)]
         public async Task<ActionResult> GetCarById([FromRoute] Guid carId)
         { 
-            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
+            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
 
-            if(car == null)
+            if(userCar == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
 
-            return Ok(_mapper.Map<GetCarByIdResponse>(car));
+            return Ok(_mapper.Map<GetCarByIdResponse>(userCar.Car));
         }
 
         [HttpPatch(Cars.PatchCar)]
         public async Task<ActionResult> PatchCar([FromRoute] Guid carId, [FromBody] PatchCarRequest request)
         {
-            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
+            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
 
-            if(car == null)
+            if(userCar == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
 
-            _mapper.Map(request, car);
-            var updateSuccess = await _carService.UpdateCarAsync(car);
+            _mapper.Map(request, userCar.Car);
+            var updateSuccess = await _carService.UpdateCarAsync(userCar.Car);
             
             if(!updateSuccess)
                 return BadRequest();
 
-            return Ok(_mapper.Map<GetCarByIdResponse>(car));
+            return Ok(_mapper.Map<GetCarByIdResponse>(userCar.Car));
         }
 
         [HttpPut(Cars.PutCar)]
         public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
         {
-            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
+            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
 
-            if(car == null)
+            if(userCar.Car == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
 
-            _mapper.Map(request, car);
-            var updateSuccess = await _carService.UpdateCarAsync(car);
+            _mapper.Map(request, userCar.Car);
+            var updateSuccess = await _carService.UpdateCarAsync(userCar.Car);
             
             if(!updateSuccess)
                 return BadRequest();
 
-            return Ok(_mapper.Map<GetCarByIdResponse>(car));
+            return Ok(_mapper.Map<GetCarByIdResponse>(userCar.Car));
         }
         
         [HttpDelete(Cars.DeleteCar)]
         public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
         {
             
-            var car = await _carService.GetUserCarByIdAsync(HttpContext.GetUserId(), carId);
+            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
 
-            if(car == null)
+            if(userCar.Car == null)
                 return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
 
-            var deleted = await _carService.DeleteCarAwait(car);
+            var deleted = await _carService.DeleteCarAwait(userCar.Car);
 
             if(!deleted)
                 return BadRequest();

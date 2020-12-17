@@ -7,6 +7,7 @@ namespace carcompanion.Services.Interfaces
 {
     public interface IExpenseService
     {
-        Task<bool> AddExpenseAsync(Car car, Expense newExpense);
+        Task<Expense> GetExpenseById(Guid expenseId);
+        Task<bool> AddExpenseAsync(User user, Car car, Expense newExpense);
     }
 }

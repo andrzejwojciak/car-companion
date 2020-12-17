@@ -8,7 +8,7 @@ namespace carcompanion.Services.Interfaces
     public interface ICarService
     {       
         Task<bool> DeleteCarAwait(Car car);
-        Task<Car> GetUserCarByIdAsync(Guid userId, Guid carId);
+        Task<UserCar> GetUserCarByIdsAsync(Guid userId, Guid carId);
         Task<Car> GetCarByIdAsync(Guid carId);
         Task<bool> UpdateCarAsync(Car car);
         Task<IEnumerable<UserCar>> GetUserCarsAsync(Guid userId);

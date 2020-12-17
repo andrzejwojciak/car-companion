@@ -19,13 +19,22 @@ namespace carcompanion.Services
             _context = context;            
         }
 
-        public async Task<bool> AddExpenseAsync(Car car, Expense newExpense)
+        //TODO: Add userId to expense owner or smth
+        public async Task<bool> AddExpenseAsync(User user, Car car, Expense newExpense)
         {
             newExpense.Car = car;
+            newExpense.User = user;
             await _context.Expenses.AddAsync(newExpense);
 
             var added = await _context.SaveChangesAsync();
             return added > 0 ? true : false;
+        }
+
+        public async Task<Expense> GetExpenseById(Guid expenseId)
+        {
+            var expense = await _context.Expenses.Include(c => c.Car)
+                                    .FirstOrDefaultAsync( i => i.ExpenseId == expenseId);            
+            return expense;                    
         }
         
     }

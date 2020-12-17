@@ -9,6 +9,8 @@ using carcompanion.Contract.V1.Responses;
 using carcompanion.Extensions;
 using carcompanion.Models;
 using carcompanion.Services.Interfaces;
+using carcompanion.Results;
+using carcompanion.Results.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +49,7 @@ namespace carcompanion.Controllers.V1
             return Ok(_mapper.Map<GetCarExpensesResponse>(expense));
         }
         
-        //TODO: Need to be fixed
+        //TODO: Need to be fixed. Every one can get car expenses!
         [HttpGet(Expenses.GetCarExpesnes)]
         public async Task<ActionResult> GetCarExpenses([FromRoute] Guid carId)
         {
@@ -82,5 +84,26 @@ namespace carcompanion.Controllers.V1
 
             return Ok(response);
         }
+
+        [HttpDelete(Expenses.DeleteCarExpenseById)]
+        public async Task<IActionResult> DeleteExpenseById([FromRoute] Guid carId, Guid expenseId)
+        {
+            var result = await _expenseService.DeleteExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());
+            return GenerateResponse(result);
+        }
+
+        private IActionResult GenerateResponse(IServiceResult result)
+        {
+            if(!result.Success)
+            {
+                if(result.ErrorMessage == null)
+                    result.ErrorMessage = "Something went wrong";
+
+                return StatusCode(result.StatusCode, result.ErrorMessage);
+            }
+            
+            return Ok();
+        }        
+        
     }
 }

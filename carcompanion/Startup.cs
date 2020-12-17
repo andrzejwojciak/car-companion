@@ -4,6 +4,8 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Text;
 using AutoMapper;
 using carcompanion.Data;
+using carcompanion.Repositories;
+using carcompanion.Repositories.Interfaces;
 using carcompanion.Security;
 using carcompanion.Services;
 using carcompanion.Services.Interfaces;
@@ -105,6 +107,9 @@ namespace carcompanion
             services.AddScoped<IRefreshtokenService, RefreshtokenService>();
             services.AddScoped<IJwtManager, JwtManager>();
             
+            services.AddTransient<IExpenseRepository, ExpenseRepository>();
+            services.AddTransient<ICarRepository, CarRepository>();
+
             services.AddSingleton<IPasswordHasher, PasswordHasher>();           
         }
 

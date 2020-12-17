@@ -16,11 +16,7 @@ namespace carcompanion.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.Entity<Car>()
-                .HasMany(c => c.Expenses)
-                .WithOne(e => e.Car);
-            
+        {            
             modelBuilder.Entity<UserCar>()
                 .HasOne(u => u.User)                     
                 .WithMany(u => u.UserCars)
@@ -35,9 +31,18 @@ namespace carcompanion.Data
                 .HasKey(uc => new { uc.CarId, uc.UserId});            
             
             modelBuilder.Entity<Expense>()
-                .Property(p => p.Amount)
+                .Property(p => p.Amount) 
                 .HasColumnType("decimal(18,2)");
-
+            
+            modelBuilder.Entity<Expense>()
+                .HasOne(u => u.User)
+                .WithMany(u => u.Expenses)
+                .HasForeignKey(p => p.UserId);
+            
+            modelBuilder.Entity<Expense>()
+                .HasOne(u => u.Car)
+                .WithMany(u => u.Expenses)
+                .HasForeignKey(p => p.CarId);
         }
         
     }

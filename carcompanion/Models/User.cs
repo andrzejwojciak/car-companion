@@ -19,6 +19,7 @@ namespace carcompanion.Models
         public bool EmailConfirmed { get; set; }
         public DateTime AddedDate { get; set; }
 
+        public ICollection<Expense> Expenses { get; set; }
         public ICollection<UserCar> UserCars { get; set; }
         
         

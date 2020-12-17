@@ -65,6 +65,12 @@ namespace carcompanion.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
+        public async Task<bool> DeleteCarAwait(Car car)
+        {
+            _context.Cars.Remove(car);            
+            return await _context.SaveChangesAsync() > 0 ? true : false;
+        }
+
         public async Task<Car> GetCarWithExpesnesByIdAsync(Guid carId)
         {
             var car = await _context.Cars

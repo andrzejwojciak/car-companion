@@ -45,7 +45,7 @@ namespace carcompanion.Controllers.V1
             var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
 
             if(car == null)
-                return BadRequest("Something went wrong!");
+                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
 
             return Ok(_mapper.Map<GetCarByIdResponse>(car));
         }
@@ -82,6 +82,23 @@ namespace carcompanion.Controllers.V1
                 return BadRequest();
 
             return Ok(_mapper.Map<GetCarByIdResponse>(car));
+        }
+        
+        [HttpDelete(Cars.DeleteCar)]
+        public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
+        {
+            
+            var car = await _carService.GetUserCarByIdAsync(Guid.Parse(HttpContext.GetUserId()), carId);
+
+            if(car == null)
+                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
+
+            var deleted = await _carService.DeleteCarAwait(car);
+
+            if(!deleted)
+                return BadRequest();
+
+            return Ok("Deleted");
         }
 
         [HttpGet(Cars.GetUserCars)]

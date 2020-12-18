@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.Json;
 using System.Threading.Tasks;
 using AutoMapper;
 using carcompanion.Contract.V1.Requests;
@@ -10,11 +7,11 @@ using carcompanion.Extensions;
 using carcompanion.Models;
 using carcompanion.Services.Interfaces;
 using carcompanion.Results;
-using carcompanion.Results.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using static carcompanion.Contract.V1.ApiRoutes;
+using carcompanion.Contract.V1.Responses.Expense;
 
 namespace carcompanion.Controllers.V1
 {
@@ -48,22 +45,6 @@ namespace carcompanion.Controllers.V1
 
             return Ok(_mapper.Map<GetCarExpensesResponse>(expense));
         }
-        
-        //TODO: Need to be fixed. Every one can get car expenses!
-        [HttpGet(Expenses.GetCarExpesnes)]
-        public async Task<ActionResult> GetCarExpenses([FromRoute] Guid carId)
-        {
-            var car = await _carService.GetCarWithExpesnesByIdAsync(carId);
-
-            if(car == null)
-                return NotFound($"Car {carId} doesn't exists");
-            
-            if(!car.Expenses.Any())
-                return Ok("Car doesn't have any expenses");
-
-            var response = _mapper.Map<ICollection<GetCarExpensesResponse>>(car.Expenses);
-            return Ok(response);
-        }
 
         [HttpPost(Expenses.CreateCarExpense)]
         public async Task<ActionResult> CreateCarExpense([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
@@ -84,26 +65,29 @@ namespace carcompanion.Controllers.V1
 
             return Ok(response);
         }
+        
+        [HttpGet(Expenses.GetCarExpesnes)]
+        public async Task<ActionResult> GetCarExpenses([FromRoute] Guid carId)
+        {
+            var result = await _expenseService.GetExpensesByCarIdAsync(carId, HttpContext.GetUserId());        
+            return GenerateResponse(result);    
+        }
 
         [HttpDelete(Expenses.DeleteCarExpenseById)]
         public async Task<IActionResult> DeleteExpenseById([FromRoute] Guid carId, Guid expenseId)
         {
-            var result = await _expenseService.DeleteExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());
-            return GenerateResponse(result);
+            var result = await _expenseService.DeleteExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());      
+            return GenerateResponse(result);    
         }
 
-        private IActionResult GenerateResponse(IServiceResult result)
+        private ActionResult GenerateResponse(ServiceResult result)
         {
             if(!result.Success)
             {
-                if(result.ErrorMessage == null)
-                    result.ErrorMessage = "Something went wrong";
-
                 return StatusCode(result.StatusCode, result.ErrorMessage);
             }
-            
-            return Ok();
-        }        
-        
+                        
+            return StatusCode(result.StatusCode, result.ResponseData);
+        }
     }
 }

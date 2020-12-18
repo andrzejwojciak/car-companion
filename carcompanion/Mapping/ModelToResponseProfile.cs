@@ -1,5 +1,6 @@
 using AutoMapper;
 using carcompanion.Contract.V1.Responses;
+using carcompanion.Contract.V1.Responses.Expense;
 using carcompanion.Models;
 
 namespace carcompanion.Mapping
@@ -13,6 +14,9 @@ namespace carcompanion.Mapping
 
             CreateMap<Expense, GetCarExpensesResponse>();
             CreateMap<Expense, CreateExpenseResponse>();
+
+            CreateMap<Expense, ExpenseResponse>();
+            CreateMap<Car, GetExpensesByCarIdResponse>();
         }
     }
 }

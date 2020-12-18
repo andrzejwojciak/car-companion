@@ -7,6 +7,8 @@ using carcompanion.Repositories.Interfaces;
 using carcompanion.Services.Interfaces;
 using carcompanion.Results;
 using Microsoft.EntityFrameworkCore;
+using carcompanion.Contract.V1.Responses.Expense;
+using AutoMapper;
 
 namespace carcompanion.Services
 {
@@ -14,11 +16,15 @@ namespace carcompanion.Services
     {
         private readonly ApplicationDbContext _context;
         private readonly IExpenseRepository _expenseRepository;
+        private readonly ICarRepository _carRepository;
+        private readonly IMapper _mapper;
 
-        public ExpenseService(ApplicationDbContext context, IExpenseRepository expenseRepository)
+        public ExpenseService(ApplicationDbContext context, IExpenseRepository expenseRepository, ICarRepository carRepository, IMapper mapper)
         {
             _expenseRepository = expenseRepository;
+            _carRepository = carRepository;
             _context = context;            
+            _mapper = mapper;
         }
 
         //TODO: Add userId to expense owner or smth
@@ -32,9 +38,9 @@ namespace carcompanion.Services
             return added > 0 ? true : false;
         }
 
-        public async Task<DeleteExpenseResult> DeleteExpenseByIdAsync(Guid carId, Guid expenseId, Guid userId)
+        public async Task<ServiceResult> DeleteExpenseByIdAsync(Guid carId, Guid expenseId, Guid userId)
         {            
-            var result = new DeleteExpenseResult();            
+            var result = new ServiceResult();            
             var expense = await _expenseRepository.GetExpenseByIdAsync(expenseId);
 
             if(expense == null)                
@@ -65,6 +71,38 @@ namespace carcompanion.Services
             
             var deleted = await _expenseRepository.DeleteExpenseAsync(expense);
             result.Success = deleted;
+            result.ResponseData = new DeleteExpenseResponse { Message = "Expense deleted" };
+            
+            return result;
+        }
+
+        public async Task<ServiceResult> GetExpensesByCarIdAsync(Guid carId, Guid userId)
+        {
+            var car = await _carRepository.GetCarByIdAsync(carId);
+            var result = new ServiceResult();
+
+            if(car == null)                
+            {                
+                result.Success = false;
+                result.ErrorMessage = "Car doesn't exists!";
+                result.StatusCode = 404;
+                result.ResponseData = null;
+                return result;
+            }
+            
+            var userHasCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);            
+            
+            if(userHasCar == null)                
+            {                
+                result.Success = false; 
+                result.ErrorMessage = "User has no permision to do that!";
+                result.StatusCode = 401;
+                result.ResponseData = null;
+                return result;
+            }
+
+            result.Success = true;
+            result.ResponseData = _mapper.Map<Car, GetExpensesByCarIdResponse>(car);
 
             return result;
         }

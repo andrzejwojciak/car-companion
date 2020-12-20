@@ -7,12 +7,14 @@ namespace carcompanion.Results
     {
         private string _errorMessage;
         private int _statusCode;
+        public bool Success { get; set; }     
+        public IResponseData ResponseData { get; set; }  
 
         public string ErrorMessage 
         { 
             get
             {
-                if(_errorMessage.Equals(null))
+                if(_errorMessage == null)
                     return "Something went wrong";
                 
                 return _errorMessage;
@@ -29,10 +31,13 @@ namespace carcompanion.Results
             {
                 if(_statusCode == 0)
                 {
-                    if(Success)
+                    if(Success) 
                     {
                         return 200;
-                    } else return 500;
+                    } else 
+                    {
+                        return 500;
+                    }
                 }
                 
                 return _statusCode;
@@ -42,8 +47,5 @@ namespace carcompanion.Results
                 _statusCode = value;
             } 
         }
-
-        public bool Success { get; set; }     
-        public IResponseData ResponseData { get; set; }  
     }
 }

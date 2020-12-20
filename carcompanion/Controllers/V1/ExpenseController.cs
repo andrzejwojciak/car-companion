@@ -49,21 +49,8 @@ namespace carcompanion.Controllers.V1
         [HttpPost(Expenses.CreateCarExpense)]
         public async Task<ActionResult> CreateCarExpense([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
         {
-            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
-
-            if(userCar.Car == null)
-                return NotFound( new { errorMessage = $"Car {carId} doesn't exist or user doesn't have that car" });
-            
-            var newExpense = _mapper.Map<Expense>(request);
-
-            var added = await _expenseService.AddExpenseAsync(userCar.User, userCar.Car, newExpense);
-
-            if(added == false)
-                return BadRequest();
-
-            var response = _mapper.Map<CreateExpenseResponse>(newExpense);
-
-            return Ok(response);
+            var result = await _expenseService.CreateExpenseAsync(carId, HttpContext.GetUserId(), _mapper.Map<Expense>(request));
+            return GenerateResponse(result);
         }
         
         [HttpGet(Expenses.GetCarExpesnes)]

@@ -1,8 +1,9 @@
 using System;
+using carcompanion.Contract.V1.Responses.Interfaces;
 
 namespace carcompanion.Contract.V1.Responses.Expense
 {    
-    public class ExpenseResponse
+    public class ExpenseResponse : IResponseData
     {
         public Guid ExpenseId { get; set; }
         public decimal Amount { get; set; }

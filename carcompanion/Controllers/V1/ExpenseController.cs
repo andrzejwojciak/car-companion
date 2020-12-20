@@ -33,17 +33,8 @@ namespace carcompanion.Controllers.V1
         [HttpGet(Expenses.GetCarExpenseById)]
         public async Task<ActionResult> GetCarExpenseById([FromRoute] Guid carId, Guid expenseId)
         {
-            var expense = await _expenseService.GetExpenseById(expenseId);
-            
-            if(expense == null)
-                return NotFound( new { errorMessage = "Expense doesn't exist" });
-
-            if(expense.Car.CarId != carId)
-                return BadRequest( new { errorMessage = "Car doesn't have that expense" });
-
-            var response = _mapper.Map<GetCarExpensesResponse>(expense);
-
-            return Ok(_mapper.Map<GetCarExpensesResponse>(expense));
+            var result = await _expenseService.GetExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());
+            return GenerateResponse(result);
         }
 
         [HttpPost(Expenses.CreateCarExpense)]

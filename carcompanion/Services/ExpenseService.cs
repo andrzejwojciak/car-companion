@@ -28,6 +28,22 @@ namespace carcompanion.Services
             _mapper = mapper;
         }
 
+        public async Task<ServiceResult> GetExpenseByIdAsync(Guid carId, Guid expenseId, Guid userId)
+        {
+            var expense = await _expenseRepository.GetExpenseByIdAsync(expenseId);
+
+            if(expense == null)
+                return UnsuccessResult("Expense doesn't exists", 404);
+            
+            if(expense.Car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)   
+                return UnsuccessResult("User doesn't have that car", 401);
+            
+            if(expense.CarId != carId)
+                return UnsuccessResult("This is not this car expense", 400);
+
+            return SuccessResult(_mapper.Map<ExpenseResponse>(expense), 200);
+        }
+
         public async Task<ServiceResult> CreateExpenseAsync(Guid carId, Guid userId, Expense expense)
         {
             var car = await _carRepository.GetCarByIdAsync(carId);
@@ -46,8 +62,7 @@ namespace carcompanion.Services
         }
 
         public async Task<ServiceResult> DeleteExpenseByIdAsync(Guid carId, Guid expenseId, Guid userId)
-        {            
-            var result = new ServiceResult();            
+        {                 
             var expense = await _expenseRepository.GetExpenseByIdAsync(expenseId);
 
             if(expense == null)             
@@ -61,16 +76,15 @@ namespace carcompanion.Services
             if(expense.CarId != carId)
                 return UnsuccessResult("This is not this car expense", 400);
 
-            result.Success = await _expenseRepository.DeleteExpenseAsync(expense);;
-            result.ResponseData = new DeleteExpenseResponse { Message = "Expense deleted" };
+            if(await _expenseRepository.DeleteExpenseAsync(expense))
+                return SuccessResult(new DeleteExpenseResponse { Message = "Expense deleted" }, 200);
             
-            return result;
+            return UnsuccessResult("Something went wrong", 500);
         }
 
         public async Task<ServiceResult> GetExpensesByCarIdAsync(Guid carId, Guid userId)
         {
             var car = await _carRepository.GetCarByIdAsync(carId);
-            var result = new ServiceResult();
 
             if(car == null)              
                 return UnsuccessResult("Car doesn't exists!", 404);
@@ -80,10 +94,7 @@ namespace carcompanion.Services
             if(userHasCar == null)             
                 return UnsuccessResult("User has no permision to do that!", 401);
 
-            result.Success = true;
-            result.ResponseData = _mapper.Map<Car, GetExpensesByCarIdResponse>(car);
-
-            return result;
+            return SuccessResult(_mapper.Map<Car, GetExpensesByCarIdResponse>(car), 200);
         }
 
         public async Task<Expense> GetExpenseById(Guid expenseId)

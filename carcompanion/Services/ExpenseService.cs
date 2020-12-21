@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using carcompanion.Contract.V1.Responses.Expense;
 using AutoMapper;
 using carcompanion.Contract.V1.Responses.Interfaces;
+using carcompanion.Contract.V1.Requests.Expense;
 
 namespace carcompanion.Services
 {
@@ -87,26 +88,38 @@ namespace carcompanion.Services
             var car = await _carRepository.GetCarByIdAsync(carId);
 
             if(car == null)              
-                return UnsuccessResult("Car doesn't exists!", 404);
-
-            var userHasCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);            
+                return UnsuccessResult("Car doesn't exists!", 404);          
             
-            if(userHasCar == null)             
+            if(car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)             
                 return UnsuccessResult("User has no permision to do that!", 401);
 
             return SuccessResult(_mapper.Map<Car, GetExpensesByCarIdResponse>(car), 200);
         }
 
-        public async Task<Expense> GetExpenseById(Guid expenseId)
+        public async Task<ServiceResult> UpdateExpenseByIdAsync(Guid carId, Guid expenseId, Guid userId, IUpdateExpenseRequest request)
         {
-            var expense = await _context.Expenses.Include(c => c.Car)
-                                    .FirstOrDefaultAsync( i => i.ExpenseId == expenseId);            
-            return expense;                    
+            var expense = await _expenseRepository.GetExpenseByIdAsync(expenseId);
+
+            if(expense == null)
+                return UnsuccessResult("Expense doesn't exist", 404);
+            
+            if(expense.CarId != carId)
+                return UnsuccessResult("This is not this car expense", 400);
+            
+            if(expense.Car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)
+                return UnsuccessResult("User can't do that", 401);
+                
+            expense = _mapper.Map(request, expense);
+
+            if(await _expenseRepository.UpdateExpenseAsync(expense))
+                return SuccessResult(_mapper.Map<ExpenseResponse>(expense), 200);
+
+            return UnsuccessResult("Something went wrong", 500);
         }
 
-        private ServiceResult UnsuccessResult(string errorMessage, int statusCode)
+        private ServiceResult UnsuccessResult(string errorMessage, int? statusCode)
         {
-            return new ServiceResult { Success = false, ErrorMessage = errorMessage, StatusCode = statusCode};
+            return new ServiceResult { Success = false, ErrorMessage = errorMessage, StatusCode = statusCode != null ? (int)statusCode : 400};
         }
 
         private ServiceResult SuccessResult(IResponseData response, int? statusCode)

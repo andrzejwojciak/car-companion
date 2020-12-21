@@ -21,8 +21,10 @@ namespace carcompanion.Contract.V1
         {            
             public const string GetCarExpesnes = Base + "/cars/{carId}/expenses";
             public const string CreateCarExpense = Base + "/cars/{carId}/expenses";
-            public const string GetCarExpenseById = Base + "/cars/{carId}/expenses/{expenseId}"; 
-            public const string DeleteCarExpenseById = Base + "/cars/{carId}/expenses/{expenseId}"; 
+            public const string GetCarExpense = Base + "/cars/{carId}/expenses/{expenseId}"; 
+            public const string DeleteCarExpense = Base + "/cars/{carId}/expenses/{expenseId}";             
+            public const string PutCarExpense = Base + "/cars/{carId}/expenses/{expenseId}"; 
+            public const string PatchCarExpense = Base + "/cars/{carId}/expenses/{expenseId}";
         }
         
     }

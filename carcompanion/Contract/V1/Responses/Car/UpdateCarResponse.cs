@@ -3,7 +3,7 @@ using carcompanion.Contract.V1.Responses.Interfaces;
 
 namespace carcompanion.Contract.V1.Responses.Car
 {
-    public class CreateCarResponse : IResponseData
+    public class UpdateCarResponse : IResponseData
     {        
         public Guid CarId { get; set; }
         public string MainName { get; set; }

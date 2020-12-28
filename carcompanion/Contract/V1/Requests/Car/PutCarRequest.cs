@@ -1,31 +1,28 @@
-using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace carcompanion.Contract.V1.Requests
+namespace carcompanion.Contract.V1.Requests.Car
 {
-    public class CreateCarRequest
+    public class PutCarRequest : IUpdateCarRequest
     {
         [MaxLength(30)]
         public string MainName { get; set; }
 
         [MaxLength(30)]
-        [Required]
         public string Brand { get; set; }
 
         [MaxLength(30)]
-        [Required]
         public string Model { get; set; }
 
         [MaxLength(30)]
         public string Generation { get; set; }
         
-        [MaxLength(8)]
+        [MaxLength(10)]
         public string Plate { get; set; }        
 
         [Range(0, 5000000, ErrorMessage = "Value for Mileage must be between 0 and 5000000")]
-        public int Mileage { get; set; }        
-        
+        public int? Mileage { get; set; }        
+     
         [Range(1900, 3000, ErrorMessage = "Value for ProductionYear must be between 1900 and 3000")]
-        public int ProductionYear { get; set; }             
+        public int ProductionYear { get; set; }          
     }
 }

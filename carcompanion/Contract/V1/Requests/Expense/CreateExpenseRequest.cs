@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using carcompanion.Models;
 using carcompanion.Validation;
 
-namespace carcompanion.Contract.V1.Requests
+namespace carcompanion.Contract.V1.Requests.Expense
 {
     public class CreateExpenseRequest
     {

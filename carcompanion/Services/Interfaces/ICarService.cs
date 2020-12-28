@@ -1,4 +1,6 @@
+using carcompanion.Contract.V1.Requests.Car;
 using carcompanion.Models;
+using carcompanion.Results;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -7,12 +9,10 @@ namespace carcompanion.Services.Interfaces
 {
     public interface ICarService
     {       
-        Task<bool> DeleteCarAwait(Car car);
-        Task<UserCar> GetUserCarByIdsAsync(Guid userId, Guid carId);
-        Task<Car> GetCarByIdAsync(Guid carId);
-        Task<bool> UpdateCarAsync(Car car);
-        Task<IEnumerable<UserCar>> GetUserCarsAsync(Guid userId);
-        Task<bool> CreateCarAsync(Car carModel, Guid userId);  
-        Task<Car> GetCarWithExpesnesByIdAsync(Guid carId);
+        Task<ServiceResult> CreateCarAsync(Guid userId, Car car);
+        Task<ServiceResult> GetCarsByUserIdAsync(Guid userId);
+        Task<ServiceResult> GetCarByIdAsync(Guid userId, Guid carId);
+        Task<ServiceResult> UpdateCarByIdAsync(Guid userId, Guid carId, IUpdateCarRequest request);
+        Task<ServiceResult> DeleteCarByIdAsync(Guid userId, Guid carId);
     }
 }

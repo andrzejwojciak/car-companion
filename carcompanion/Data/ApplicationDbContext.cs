@@ -14,9 +14,10 @@ namespace carcompanion.Data
         public DbSet<Car> Cars { get; set; }
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
-
+        public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {            
+        {   
             modelBuilder.Entity<UserCar>()
                 .HasOne(u => u.User)                     
                 .WithMany(u => u.UserCars)
@@ -43,6 +44,8 @@ namespace carcompanion.Data
                 .HasOne(u => u.Car)
                 .WithMany(u => u.Expenses)
                 .HasForeignKey(p => p.CarId);
+                        
+            modelBuilder.Seed();      
         }
         
     }

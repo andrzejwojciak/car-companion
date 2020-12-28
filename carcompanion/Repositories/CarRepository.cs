@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using carcompanion.Data;
 using carcompanion.Models;
@@ -25,6 +27,7 @@ namespace carcompanion.Repositories
         public async Task<bool> DeleteCarAsync(Car car)
         {
             _context.Cars.Remove(car);
+            _context.UserCars.RemoveRange(car.UserCars);
             return await SaveChangesAsync();
         }
 
@@ -36,6 +39,17 @@ namespace carcompanion.Repositories
                                 .FirstOrDefaultAsync(i => i.CarId == carId);
 
             return car;
+        }
+
+        public async Task<IEnumerable<Car>> GetUserCarsByIdAsync(Guid userId)
+        {
+            var cars = await _context.UserCars
+                                .Include(c => c.Car)
+                                .Where(u => u.UserId == userId) 
+                                .Select(c => c.Car)
+                                .ToListAsync();
+
+            return cars;
         }
 
         public async Task<bool> UpdateCarAsync(Car car)

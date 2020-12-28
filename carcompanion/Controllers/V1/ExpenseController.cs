@@ -27,17 +27,17 @@ namespace carcompanion.Controllers.V1
             _mapper = mapper;
         }
 
-        [HttpGet(Expenses.GetCarExpense)]
-        public async Task<ActionResult> GetCarExpense([FromRoute] Guid carId, Guid expenseId)
-        {
-            var result = await _expenseService.GetExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());
-            return GenerateResponse(result);
-        }
-
         [HttpPost(Expenses.CreateCarExpense)]
         public async Task<ActionResult> CreateCarExpense([FromRoute] Guid carId, [FromBody] CreateExpenseRequest request)
         {
             var result = await _expenseService.CreateExpenseAsync(carId, HttpContext.GetUserId(), _mapper.Map<Expense>(request));
+            return GenerateResponse(result);
+        }
+
+        [HttpGet(Expenses.GetCarExpense)]
+        public async Task<ActionResult> GetCarExpense([FromRoute] Guid carId, Guid expenseId)
+        {
+            var result = await _expenseService.GetExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());
             return GenerateResponse(result);
         }
         
@@ -46,13 +46,13 @@ namespace carcompanion.Controllers.V1
         {
             var result = await _expenseService.GetExpensesByCarIdAsync(carId, HttpContext.GetUserId());        
             return GenerateResponse(result);    
-        }
+        }        
 
-        [HttpDelete(Expenses.DeleteCarExpense)]
-        public async Task<IActionResult> DeleteExpense([FromRoute] Guid carId, Guid expenseId)
+        [HttpGet(Expenses.GetCategories)]
+        public async Task<IActionResult> GetExpenseCategories()
         {
-            var result = await _expenseService.DeleteExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());      
-            return GenerateResponse(result);    
+            var result = await _expenseService.GetExpenseCategoriesAsync();
+            return GenerateResponse(result);
         }
 
         [HttpPut(Expenses.PutCarExpense)]
@@ -67,6 +67,13 @@ namespace carcompanion.Controllers.V1
         {
             var result = await _expenseService.UpdateExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId(), request);
             return GenerateResponse(result);
+        }
+
+        [HttpDelete(Expenses.DeleteCarExpense)]
+        public async Task<IActionResult> DeleteExpense([FromRoute] Guid carId, Guid expenseId)
+        {
+            var result = await _expenseService.DeleteExpenseByIdAsync(carId, expenseId, HttpContext.GetUserId());      
+            return GenerateResponse(result);    
         }
 
         private ActionResult GenerateResponse(ServiceResult result)

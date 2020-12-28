@@ -15,6 +15,8 @@ namespace carcompanion.Mapping
             CreateMap<Car, CreateCarResponse>();
             CreateMap<Car, GetCarByIdResponse>();
             CreateMap<Car, UpdateCarResponse>();
+
+            CreateMap<ExpenseCategory, ExpenseCategoryResponse>();
         }
     }
 }

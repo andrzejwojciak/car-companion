@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using carcompanion.Models;
 
@@ -9,6 +10,7 @@ namespace carcompanion.Repositories.Interfaces
         Task<bool> CreateExpenseAsync(Expense expense);
         Task<Expense> GetExpenseByIdAsync(Guid expenseId);        
         Task<bool> UpdateExpenseAsync(Expense expense);
-        Task<bool> DeleteExpenseAsync(Expense expense);         
+        Task<bool> DeleteExpenseAsync(Expense expense);       
+        Task<IEnumerable<ExpenseCategory>> GetExpenseCatagoriesAsync();
     }
 }

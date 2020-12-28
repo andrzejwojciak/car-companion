@@ -2,7 +2,7 @@
 
 namespace carcompanion.Data.Migrations
 {
-    public partial class addexpensecategorytable : Migration
+    public partial class addexpensecategory : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -17,18 +17,6 @@ namespace carcompanion.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ExpenseCategories", x => x.ExpenseCategoryId);
-                });
-
-            migrationBuilder.InsertData(
-                table: "ExpenseCategories",
-                columns: new[] { "ExpenseCategoryId", "Description", "ParentId" },
-                values: new object[,]
-                {
-                    { "Insurance1", "Description1", null },
-                    { "Insurance2", "Description2", null },
-                    { "Insurance3", "Description3", "Insurance1" },
-                    { "Insurance4", "Description4", "Insurance2" },
-                    { "Insurance5", "Description5", "Insurance2" }
                 });
         }
 

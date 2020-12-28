@@ -8,11 +8,11 @@ namespace carcompanion.Data
         public static void Seed(this ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<ExpenseCategory>().HasData(
-                new ExpenseCategory { ExpenseCategoryId = "Insurance1", Description = "Description1", ParentId = null },
-                new ExpenseCategory { ExpenseCategoryId = "Insurance2", Description = "Description2", ParentId = null },
-                new ExpenseCategory { ExpenseCategoryId = "Insurance3", Description = "Description3", ParentId = "Insurance1" },
-                new ExpenseCategory { ExpenseCategoryId = "Insurance4", Description = "Description4", ParentId = "Insurance2" },
-                new ExpenseCategory { ExpenseCategoryId = "Insurance5", Description = "Description5", ParentId = "Insurance2" }
+                new ExpenseCategory { ExpenseCategoryId = "other", Description = null, ParentId = null },
+                new ExpenseCategory { ExpenseCategoryId = "insurance", Description = null, ParentId = null },
+                new ExpenseCategory { ExpenseCategoryId = "repair", Description = null, ParentId = null },
+                new ExpenseCategory { ExpenseCategoryId = "fuel", Description = null, ParentId = null },       
+                new ExpenseCategory { ExpenseCategoryId = "utilization", Description = null, ParentId = null }                
             );
         }
     }

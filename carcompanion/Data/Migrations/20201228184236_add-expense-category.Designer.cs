@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using carcompanion.Data;
 
 namespace carcompanion.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20201228184236_add-expense-category")]
+    partial class addexpensecategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -107,28 +109,6 @@ namespace carcompanion.Data.Migrations
                     b.HasKey("ExpenseCategoryId");
 
                     b.ToTable("ExpenseCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            ExpenseCategoryId = "other"
-                        },
-                        new
-                        {
-                            ExpenseCategoryId = "insurance"
-                        },
-                        new
-                        {
-                            ExpenseCategoryId = "repair"
-                        },
-                        new
-                        {
-                            ExpenseCategoryId = "fuel"
-                        },
-                        new
-                        {
-                            ExpenseCategoryId = "utilization"
-                        });
                 });
 
             modelBuilder.Entity("carcompanion.Models.RefreshToken", b =>

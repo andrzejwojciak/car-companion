@@ -10,8 +10,8 @@ using carcompanion.Data;
 namespace carcompanion.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20201228162304_add-expense-category-table")]
-    partial class addexpensecategorytable
+    [Migration("20201228185347_add-expense-category-seed")]
+    partial class addexpensecategoryseed
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -113,31 +113,23 @@ namespace carcompanion.Data.Migrations
                     b.HasData(
                         new
                         {
-                            ExpenseCategoryId = "Insurance1",
-                            Description = "Description1"
+                            ExpenseCategoryId = "other"
                         },
                         new
                         {
-                            ExpenseCategoryId = "Insurance2",
-                            Description = "Description2"
+                            ExpenseCategoryId = "insurance"
                         },
                         new
                         {
-                            ExpenseCategoryId = "Insurance3",
-                            Description = "Description3",
-                            ParentId = "Insurance1"
+                            ExpenseCategoryId = "repair"
                         },
                         new
                         {
-                            ExpenseCategoryId = "Insurance4",
-                            Description = "Description4",
-                            ParentId = "Insurance2"
+                            ExpenseCategoryId = "fuel"
                         },
                         new
                         {
-                            ExpenseCategoryId = "Insurance5",
-                            Description = "Description5",
-                            ParentId = "Insurance2"
+                            ExpenseCategoryId = "utilization"
                         });
                 });
 

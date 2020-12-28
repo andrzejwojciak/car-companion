@@ -3,14 +3,12 @@ using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using carcompanion.Services.Interfaces;
 using static carcompanion.Contract.V1.ApiRoutes;
-using carcompanion.Contract.V1.Requests;
+using carcompanion.Contract.V1.Requests.Car;
 using carcompanion.Models;
-using carcompanion.Contract.V1.Responses;
 using System;
 using Microsoft.AspNetCore.Authorization;
 using carcompanion.Extensions;
-using System.Linq;
-using System.Collections.Generic;
+using carcompanion.Results;
 
 namespace carcompanion.Controllers.V1
 {
@@ -30,89 +28,51 @@ namespace carcompanion.Controllers.V1
         [HttpPost(Cars.CreateCar)]
         public async Task<ActionResult> Create(CreateCarRequest request)
         {
-            var car = _mapper.Map<Car>(request);
-            var created = await _carService.CreateCarAsync(car, HttpContext.GetUserId());
-
-            if(created)
-                return Ok(_mapper.Map<CreateCarResponse>(car));
-                
-            return BadRequest();
-        }
-
-        [HttpGet(Cars.GetCarById)]
-        public async Task<ActionResult> GetCarById([FromRoute] Guid carId)
-        { 
-            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
-
-            if(userCar == null)
-                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
-
-            return Ok(_mapper.Map<GetCarByIdResponse>(userCar.Car));
-        }
-
-        [HttpPatch(Cars.PatchCar)]
-        public async Task<ActionResult> PatchCar([FromRoute] Guid carId, [FromBody] PatchCarRequest request)
-        {
-            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
-
-            if(userCar == null)
-                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
-
-            _mapper.Map(request, userCar.Car);
-            var updateSuccess = await _carService.UpdateCarAsync(userCar.Car);
-            
-            if(!updateSuccess)
-                return BadRequest();
-
-            return Ok(_mapper.Map<GetCarByIdResponse>(userCar.Car));
-        }
-
-        [HttpPut(Cars.PutCar)]
-        public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
-        {
-            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
-
-            if(userCar.Car == null)
-                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
-
-            _mapper.Map(request, userCar.Car);
-            var updateSuccess = await _carService.UpdateCarAsync(userCar.Car);
-            
-            if(!updateSuccess)
-                return BadRequest();
-
-            return Ok(_mapper.Map<GetCarByIdResponse>(userCar.Car));
-        }
-        
-        [HttpDelete(Cars.DeleteCar)]
-        public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
-        {
-            
-            var userCar = await _carService.GetUserCarByIdsAsync(HttpContext.GetUserId(), carId);
-
-            if(userCar.Car == null)
-                return BadRequest( new { ErrorMessage = "User doesn't have that car or that car doesn't exist"});
-
-            var deleted = await _carService.DeleteCarAwait(userCar.Car);
-
-            if(!deleted)
-                return BadRequest();
-
-            return Ok("Deleted");
+            var result = await _carService.CreateCarAsync(HttpContext.GetUserId(), _mapper.Map<Car>(request));
+            return GenreateResponse(result);
         }
 
         [HttpGet(Cars.GetUserCars)]
         public async Task<ActionResult> GetUserCars()
         {
-            var userId = HttpContext.GetUserId();
-            var userCars = await _carService.GetUserCarsAsync(userId);
-            var cars = userCars.Select(x => x.Car).ToList();
+            var result = await _carService.GetCarsByUserIdAsync(HttpContext.GetUserId());
+            return GenreateResponse(result);
+        }        
 
-            if(cars.Count() == 0)
-                return NotFound( new {ErrorMessage = "User doesn't have any cars"});
-            
-            var carsResponse = _mapper.Map<IEnumerable<GetCarByIdResponse>>(cars);
-            return Ok(new GetUserCarsResponse{ UserId = userId.ToString(), Cars = carsResponse });
+        [HttpGet(Cars.GetCarById)]
+        public async Task<ActionResult> GetCar([FromRoute] Guid carId)
+        {
+            var result = await _carService.GetCarByIdAsync(HttpContext.GetUserId(), carId); 
+            return GenreateResponse(result);
+        }        
+
+        [HttpPut(Cars.PutCar)]
+        public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
+        {
+            var result = await _carService.UpdateCarByIdAsync(HttpContext.GetUserId(), carId, request);
+            return GenreateResponse(result);
+        }
+
+        [HttpPatch(Cars.PatchCar)]
+        public async Task<ActionResult> PatchCar([FromRoute] Guid carId, [FromBody] PatchCarRequest request)
+        {
+            var result = await _carService.UpdateCarByIdAsync(HttpContext.GetUserId(), carId, request);
+            return GenreateResponse(result);
+        }
+        
+        [HttpDelete(Cars.DeleteCar)]
+        public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
+        {            
+            var result = await _carService.DeleteCarByIdAsync(HttpContext.GetUserId(), carId);
+            return GenreateResponse(result);
+        }
+
+        private ActionResult GenreateResponse(ServiceResult result)
+        {
+            if(!result.Success)
+                return StatusCode(result.StatusCode, result.ErrorMessage);            
+
+            return StatusCode(result.StatusCode, result.ResponseData);
         }
 
     }

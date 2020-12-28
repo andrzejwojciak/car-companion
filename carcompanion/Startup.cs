@@ -109,6 +109,7 @@ namespace carcompanion
             
             services.AddTransient<IExpenseRepository, ExpenseRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
+            services.AddTransient<IUserCarRepository, UserCarRepository>();
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();           
         }

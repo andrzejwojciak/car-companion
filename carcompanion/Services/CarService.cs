@@ -6,78 +6,119 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using carcompanion.Results;
+using carcompanion.Repositories.Interfaces;
+using carcompanion.Contract.V1.Responses.Interfaces;
+using carcompanion.Contract.V1.Responses.Car;
+using AutoMapper;
+using carcompanion.Contract.V1.Requests.Car;
 
 namespace carcompanion.Services
 {
     public class CarService : ICarService
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICarRepository _carRepository;
+        private readonly IUserCarRepository _userCarRepository;
+        private readonly IMapper _mapper;
 
-        public CarService(ApplicationDbContext context)
+        public CarService(ApplicationDbContext context, ICarRepository carRepository, IUserCarRepository userCarRepository, IMapper mapper)
         {
+            _mapper = mapper;
+            _carRepository = carRepository;
+            _userCarRepository = userCarRepository;
             _context = context;
         }
 
-        public async Task<bool> CreateCarAsync(Car carModel, Guid userId)
+        public async Task<ServiceResult> CreateCarAsync(Guid userId, Car car)
+        {   
+            if(car.MainName == null)
+                GenerateMainName(car);
+
+            if(!await _carRepository.CreateCarAsync(car))
+                return FailResult(400, "Couldn't create a car");
+
+            var userCar = new UserCar { UserId = userId, CarId = car.CarId};            
+            if(!await _userCarRepository.CreateUserCarAsync(userCar))
+                return FailResult(400, "Couldn't create a car");            
+
+            return SuccessResult(201, _mapper.Map<CreateCarResponse>(car));
+        }
+
+        public async Task<ServiceResult> GetCarsByUserIdAsync(Guid userId)
         {
-            if(carModel.MainName == null)
-                GenerateMainName(carModel);
+            var cars = await _carRepository.GetUserCarsByIdAsync(userId);
 
-            _context.Cars.Add(carModel);
-
-            var userCar = new UserCar{ UserId = userId, CarId = carModel.CarId };
+            if(cars == null)
+                return FailResult(404, "User doesn't have any car");
             
-            _context.UserCars.Add(userCar);
-
-            var added = await _context.SaveChangesAsync();
-            return added > 0 ? true : false;
+            var carsResponse = _mapper.Map<IEnumerable<GetCarByIdResponse>>(cars);            
+            var response = new GetUserCarsResponse{ UserId = userId.ToString(), Cars = carsResponse};
+            return SuccessResult(200, response);
         }
 
-        public async Task<UserCar> GetUserCarByIdsAsync(Guid userId, Guid carId)
+        public async Task<ServiceResult> GetCarByIdAsync(Guid userId, Guid carId)
         {
-            var hasUserCar = await _context.UserCars
-                    .Include(u => u.User)
-                    .Include(u => u.Car)
-                    .FirstOrDefaultAsync(x => x.UserId == userId && x.CarId == carId);
+            var car = await _carRepository.GetCarByIdAsync(carId);
+
+            if(car == null)
+                return FailResult(404, "Car doesn't exist");
             
-            return hasUserCar;
+            if(car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)
+                return FailResult(401, "Car doesn't belong to this user");
+            
+            return SuccessResult(200, _mapper.Map<GetCarByIdResponse>(car));
         }
 
-        public async Task<Car> GetCarByIdAsync(Guid carId) 
+        public async Task<ServiceResult> UpdateCarByIdAsync(Guid userId, Guid carId, IUpdateCarRequest request)
         {
-            var car = await _context.Cars.FirstOrDefaultAsync(x => x.CarId == carId);
-            return car;
+            var car = await _carRepository.GetCarByIdAsync(carId);
+
+            if(car == null)
+                return FailResult(404, "Car doesn't exist");
+            
+            if(car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)
+                return FailResult(401, "Car doesn't belong to this user");
+            
+            car = _mapper.Map(request, car);
+
+            if(!await _carRepository.UpdateCarAsync(car))
+                return FailResult(500, "Failed while updating the car");
+
+            return SuccessResult(200, _mapper.Map<UpdateCarResponse>(car));
+        }
+        
+        public async Task<ServiceResult> DeleteCarByIdAsync(Guid userId, Guid carId)
+        {
+            var car = await _carRepository.GetCarByIdAsync(carId);
+
+            if(car == null)
+                return FailResult(404, "Car doesn't exist");
+            
+            var userCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);
+            if(userCar == null)
+                return FailResult(401, "Car doesn't belong to this user");
+            
+            if(!await _carRepository.DeleteCarAsync(car))
+                return FailResult(500, "Failed while deleting car");
+            
+            return SuccessResult(200, new DeleteCarResponse { CarDeleted = true});
+
         }
 
-        public async Task<IEnumerable<UserCar>> GetUserCarsAsync(Guid userId)
-        {            
-            var userCars = await _context.UserCars.Where(u => u.UserId == userId).Include(c => c.Car).ToListAsync();     
-            return userCars;
+        private ServiceResult FailResult(int statusCode, string ErrorMessage)
+        {
+            return new ServiceResult{ Success = false, StatusCode = statusCode, ErrorMessage = ErrorMessage};
         }
 
-        public async Task<bool> UpdateCarAsync(Car car)
+        private ServiceResult SuccessResult(int statusCode, IResponseData responseData)
         {
-            _context.Cars.Update(car);
-            return await _context.SaveChangesAsync() > 0;
+            return new ServiceResult{ Success = true, StatusCode = statusCode, ResponseData = responseData};
         }
-
-        public async Task<bool> DeleteCarAwait(Car car)
+    
+        private void GenerateMainName(Car car)
         {
-            _context.Cars.Remove(car);            
-            return await _context.SaveChangesAsync() > 0 ? true : false;
-        }
-
-        public async Task<Car> GetCarWithExpesnesByIdAsync(Guid carId)
-        {
-            var car = await _context.Cars
-                                .Include(x => x.Expenses)
-                                .FirstOrDefaultAsync(x => x.CarId == carId);
-
-            return car;
-        }       
-        private void GenerateMainName(Car carModel)
-        {
-            carModel.MainName = carModel.Brand + "-" + carModel.Model;
+            car.MainName = car.Brand + "-" + car.Model;
         }
     }
 }

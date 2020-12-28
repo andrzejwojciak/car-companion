@@ -1,8 +1,9 @@
 using System;
+using carcompanion.Contract.V1.Responses.Interfaces;
 
-namespace carcompanion.Contract.V1.Responses
+namespace carcompanion.Contract.V1.Responses.Car
 {
-    public class GetCarByIdResponse
+    public class GetCarByIdResponse : IResponseData
     {        
         public Guid CarId { get; set; }
         public string MainName { get; set; }

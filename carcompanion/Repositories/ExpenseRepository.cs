@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using carcompanion.Data;
 using carcompanion.Models;
@@ -42,6 +43,11 @@ namespace carcompanion.Repositories
         {
             _context.Expenses.Update(expense);
             return await SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<ExpenseCategory>> GetExpenseCatagoriesAsync()
+        {
+            return await _context.ExpenseCategories.ToListAsync();
         }
 
         private async Task<bool> SaveChangesAsync()

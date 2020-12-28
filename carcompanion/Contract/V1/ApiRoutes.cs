@@ -9,12 +9,12 @@ namespace carcompanion.Contract.V1
 
         public static class Cars
         {
-            public const string CreateCar = Base + "/cars";                   
+            public const string CreateCar = Base + "/cars";   
+            public const string GetCarById = Base + "/cars/{carId}";   
+            public const string GetUserCars = Base + "/cars/";               
             public const string PutCar = Base + "/cars/{carId}";
             public const string PatchCar = Base + "/cars/{carId}";
-            public const string GetCarById = Base + "/cars/{carId}";  
             public const string DeleteCar = Base + "/cars/{carId}";
-            public const string GetUserCars = Base + "/cars/";
         }
         
         public static class Expenses
@@ -25,6 +25,7 @@ namespace carcompanion.Contract.V1
             public const string DeleteCarExpense = Base + "/cars/{carId}/expenses/{expenseId}";             
             public const string PutCarExpense = Base + "/cars/{carId}/expenses/{expenseId}"; 
             public const string PatchCarExpense = Base + "/cars/{carId}/expenses/{expenseId}";
+            public const string GetCategories = Base + "/cars/expenses/categories";
         }        
     }
 }

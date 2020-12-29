@@ -1,12 +1,13 @@
 using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using carcompanion.Models;
+using carcompanion.Results;
 using carcompanion.Services.Interfaces;
-using carcompanion.Services.Results;
 using Microsoft.IdentityModel.Tokens;
 
 namespace carcompanion.Security
@@ -45,30 +46,32 @@ namespace carcompanion.Security
         public async Task<AuthenticationResult> RefreshTokenAsync(string accessToken, string refreshToken)
         {
             var validatedAccessToken = GetValidatedAccessToken(accessToken);
-
+            
             if(validatedAccessToken == null)
-                return new AuthenticationResult { Success = false, ErrorMessage = "Token is not vaild" };
+                return new AuthenticationResult { Success = false, ErrorMessage = "Token is not valid" };
 
             if(validatedAccessToken.ValidTo > DateTime.UtcNow)
                 return new AuthenticationResult { Success = false, ErrorMessage = "Access token hadn't expired yet" };
             
             var accessTokenJti = validatedAccessToken.Id;
-            var refreshTokenResult = await _refreshtokenService.ValidateRefreshTokenAsync(accessTokenJti, refreshToken);
-            var authenticationResult = new AuthenticationResult{ Success = refreshTokenResult.Success, ErrorMessage = refreshTokenResult.ErrorMessage };
+            var result = await _refreshtokenService.ValidateRefreshTokenAsync(accessTokenJti, refreshToken);
 
-            if(!authenticationResult.Success)
-                return authenticationResult;
+            if(!result.Success)
+                return result;
                 
-            var tokenClaims = validatedAccessToken.Claims;
             var newAccessTokenJti = Guid.NewGuid();
+            GetFromClaims(validatedAccessToken.Claims, out var email, out var userId);
 
-            var email = tokenClaims.First(x => x.Type.Equals("email")).Value;
-            var userId = Guid.Parse(tokenClaims.First(x => x.Type.Equals("sub")).Value);
-
-            authenticationResult.AccessToken = GenerateAccessToken(newAccessTokenJti, userId, email);
-            authenticationResult.RefreshToken = await GenerateRefreshToken(newAccessTokenJti, userId);
+            result.AccessToken = GenerateAccessToken(newAccessTokenJti, userId, email);
+            result.RefreshToken = await GenerateRefreshToken(newAccessTokenJti, userId);
             
-            return authenticationResult;
+            return result;
+        }
+
+        private void GetFromClaims(IEnumerable<Claim> tokenClaims, out string email, out Guid userId)
+        {
+            email = tokenClaims.First(x => x.Type.Equals("email")).Value;
+            userId = Guid.Parse(tokenClaims.First(x => x.Type.Equals("sub")).Value);
         }
 
         private JwtSecurityToken GetValidatedAccessToken(string accessToken)
@@ -89,7 +92,7 @@ namespace carcompanion.Security
                             RequireExpirationTime = false,
                             ClockSkew = TimeSpan.Zero    
                       };
-
+            
             try
             {             
                 securityTokenHandler.ValidateToken(accessToken, tokenValidationParameters, out var token);   

@@ -10,6 +10,7 @@ using carcompanion.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
+using carcompanion.Results;
 
 namespace carcompanion.Controllers.Security
 {
@@ -17,60 +18,36 @@ namespace carcompanion.Controllers.Security
     [ApiController]
     public class AuthController : ControllerBase
     {
-        private readonly IUserService _userService;
-        private readonly IMapper _mapper;
-        private readonly IJwtManager _jwtManager;
+        private readonly IAuthService _authService;
 
-        public AuthController(IUserService userService, IMapper mapper, IJwtManager jwtManager)
+        public AuthController(IAuthService authService)
         {
-            _jwtManager = jwtManager;
-            _mapper = mapper;
-            _userService = userService;
+            _authService = authService;
         }
-
-        [AllowAnonymous]
-        [HttpPost(Auth.Login)]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
-        {
-            //TODO: Get AuthenticationResult from _userUservice
-            var user = await _userService.GetUserByEmailAsync(request.Email);
-            
-            if(user == null)
-                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "Login or password is wrong."  });
-            
-            if(!_userService.IsPasswordMatch(user, request.Password))
-                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "Login or password is wrong." });
-            
-            return await AuthenticateUser(user);
-        }
-
+        
         [AllowAnonymous]
         [HttpPost(Auth.Register)]
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {            
-            //TODO: Get AuthenticationResult from _userUservice
-            if(await _userService.UserExistsByEmailAsync(request.Email))
-                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "User already exists" });
-            
-            var newUser = _mapper.Map<User>(request);
-            
-            if(!await _userService.RegisterUserAsync(newUser))
-                return CreateAuthenticationResponse(new AuthenticationResult { Success = false, ErrorMessage = "Something went wrong" });
-            
-            return await AuthenticateUser(newUser);
+            var result = await _authService.RegisterUserAsync(request);
+            return GenerateResponse(result); 
         }
-
+        
+        [AllowAnonymous]
+        [HttpPost(Auth.Login)]
+        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        {
+            var result = await _authService.LoginUserAsync(request);
+            return GenerateResponse(result);             
+        }
+        
         [AllowAnonymous]
         [HttpPost(Auth.Refresh)]
         public async Task<IActionResult> RefreshToken([FromBody] RefreshTokenRequest request)
         {
-            var refreshTokenResult = await _jwtManager.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
-
-            if(!refreshTokenResult.Success)
-                return Unauthorized(refreshTokenResult.ErrorMessage);
-
-            return Ok(refreshTokenResult);
-        }        
+            var result = await _authService.RefreshTokenAsync(request);
+            return GenerateResponse(result);
+        }     
 
         [HttpPost(Auth.Logout)]
         public IActionResult Logout()
@@ -80,20 +57,12 @@ namespace carcompanion.Controllers.Security
             return Ok("Work in progress...");
         }
 
-        private async Task<IActionResult> AuthenticateUser(User user)
+        private ActionResult GenerateResponse(AuthenticationResult result)
         {
-            var authenticationResult = await _jwtManager.AuthenticateUserAsync(user);            
-            return CreateAuthenticationResponse(authenticationResult);
-        }
-
-        private IActionResult CreateAuthenticationResponse(AuthenticationResult result)
-        {
-            //TODO: Use automapper to map responses
-            if(!result.Success)
-                return Unauthorized( new AuthFailedResponse{ Success = false, Error = result.ErrorMessage } );
-
-            return Ok( new AuthSuccessResponse{ Success = true, AccessToken = result.AccessToken, RefreshToken = result.RefreshToken } );
-        }        
-
+            if(result.Success)
+                return StatusCode(200, new AuthSuccessResponse{ Success = true, RefreshToken = result.RefreshToken, AccessToken = result.AccessToken });
+            
+            return StatusCode(400, new AuthFailedResponse{ Success = false, Error = result.ErrorMessage });
+        }  
     }
 }

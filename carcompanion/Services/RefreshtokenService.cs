@@ -2,28 +2,27 @@ using System;
 using System.Threading.Tasks;
 using carcompanion.Data;
 using carcompanion.Models;
-using carcompanion.Services.Results;
 using carcompanion.Services.Interfaces;
-using Microsoft.EntityFrameworkCore;
+using carcompanion.Repositories.Interfaces;
+using carcompanion.Results;
 
 namespace carcompanion.Services
 {
     public class RefreshtokenService : IRefreshtokenService
     {
-        private readonly ApplicationDbContext _context;
-
-        public RefreshtokenService(ApplicationDbContext context)
+        private readonly IRefreshTokenRepository _refreshTokenRepository;
+        
+        public RefreshtokenService(IRefreshTokenRepository refreshTokenRepository)
         {
-            _context = context;
+            _refreshTokenRepository = refreshTokenRepository;
         }
 
         public async Task<bool> SaveRefreshTokenAsync(RefreshToken refreshToken)
         {
-             await _context.AddAsync(refreshToken);
-             return await _context.SaveChangesAsync() > 0 ? true : false;
+            return await _refreshTokenRepository.AddRefreshTokenAsync(refreshToken);            
         }
 
-        public async Task<RefreshTokenValidationResult> ValidateRefreshTokenAsync(string accessTokenJtiString, string refreshTokenIdString)
+        public async Task<AuthenticationResult> ValidateRefreshTokenAsync(string accessTokenJtiString, string refreshTokenIdString)
         {
             var refreshTokenId = new Guid();
             var accessTokenJti = new Guid();
@@ -35,33 +34,33 @@ namespace carcompanion.Services
             }
             catch
             {
-                return RefreshTokenValidationFailed("Something is wrong with your tokens");
+                return ValidationFailed("Something is wrong with your tokens");
             }
 
-            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(i => i.RefreshTokenId == refreshTokenId);
+            var refreshToken = await _refreshTokenRepository.GetRefreshTokenByIdAsync(refreshTokenId);
 
             if(refreshToken == null)
-                return RefreshTokenValidationFailed("This refresh token doesn't exist");
+                return ValidationFailed("This refresh token doesn't exist");
 
             if(refreshToken.AccessTokenJti != accessTokenJti)
-                return RefreshTokenValidationFailed("This refresh token isn't related with this access token");
+                return ValidationFailed("This refresh token isn't related with this access token");
 
             if(refreshToken.ExpirationDate < DateTime.UtcNow)
-                return RefreshTokenValidationFailed("This refresh token is expired");
+                return ValidationFailed("This refresh token is expired");
             
             if(refreshToken.Used)
-                return RefreshTokenValidationFailed("This refresh token has been used");
+                return ValidationFailed("This refresh token has been used");
 
             refreshToken.Used = true;
-            _context.RefreshTokens.Update(refreshToken);
-            await _context.SaveChangesAsync();
+            if(!await _refreshTokenRepository.UpdateRefreshTokenAsync(refreshToken))
+                return ValidationFailed("Somehting went wrong");
 
-            return new RefreshTokenValidationResult{ Success = true };
+            return new AuthenticationResult{ Success = true };
         }
 
-        private RefreshTokenValidationResult RefreshTokenValidationFailed(string errorMessage)
+        private AuthenticationResult ValidationFailed(string errorMessage)
         {
-            return new RefreshTokenValidationResult{ ErrorMessage = errorMessage, Success = false };
+            return new AuthenticationResult{ ErrorMessage = errorMessage, Success = false };
         }
     }
 }

@@ -22,5 +22,21 @@ namespace carcompanion.Extensions
             }
 
         }
+
+        public static Guid GetAccessTokenJti(this HttpContext httpContext)
+        {
+            if(httpContext.User == null)
+                return Guid.Empty;
+
+            try
+            {
+                var userId = Guid.Parse(httpContext.User.Claims.FirstOrDefault( x => x.Type.Equals("jti")).Value); 
+                return userId;
+            }
+            catch
+            {
+                return Guid.Empty;
+            }
+        }
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -19,13 +20,15 @@ namespace carcompanion.Services
         private readonly IMapper _mapper;
         private readonly IJwtManager _jwtManager;
         private readonly IUserRepository _userRepository;
+        private readonly IRefreshtokenService _refreshTokenService;
 
-        public AuthService(IPasswordHasher hasher, IMapper mapper, IJwtManager jwtManager, IUserRepository userRepository)
+        public AuthService(IPasswordHasher hasher, IMapper mapper, IJwtManager jwtManager, IUserRepository userRepository, IRefreshtokenService refreshTokenService)
         {
             _hasher = hasher;
             _mapper = mapper;
             _jwtManager = jwtManager;
             _userRepository = userRepository;
+            _refreshTokenService = refreshTokenService;
         }
 
         public async Task<AuthenticationResult> RegisterUserAsync(RegisterRequest request)
@@ -56,7 +59,13 @@ namespace carcompanion.Services
         
         public async Task<AuthenticationResult> RefreshTokenAsync(RefreshTokenRequest request)
         {
-            return await _jwtManager.RefreshTokenAsync(request.AccessToken, request.RefreshToken);
+            return await _jwtManager.RefreshTokenAsync(request.RefreshToken, request.AccessToken);
+        }
+
+        public async Task<LogoutResult> LogoutUserAsync(Guid refreshToken, Guid accessTokenJti)
+        {
+            var result = await _refreshTokenService.RemoveRefreshTokenAsync(refreshToken, accessTokenJti);    
+            return new LogoutResult{ Success = result.Success, ErrorMessage = result.ErrorMessage};
         }
 
         private AuthenticationResult AuthFailed(string errorMessage)

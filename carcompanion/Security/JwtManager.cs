@@ -15,7 +15,7 @@ namespace carcompanion.Security
     public interface IJwtManager
     {
         Task<AuthenticationResult> AuthenticateUserAsync(User user);
-        Task<AuthenticationResult> RefreshTokenAsync(string accessToken, string refreshToken);
+        Task<AuthenticationResult> RefreshTokenAsync(Guid refreshTokenId, string accessToken);
     }
 
     public class JwtManager : IJwtManager
@@ -43,7 +43,7 @@ namespace carcompanion.Security
             return authResult;
         }
 
-        public async Task<AuthenticationResult> RefreshTokenAsync(string accessToken, string refreshToken)
+        public async Task<AuthenticationResult> RefreshTokenAsync(Guid refreshTokenId, string accessToken)
         {
             var validatedAccessToken = GetValidatedAccessToken(accessToken);
             
@@ -53,8 +53,8 @@ namespace carcompanion.Security
             if(validatedAccessToken.ValidTo > DateTime.UtcNow)
                 return new AuthenticationResult { Success = false, ErrorMessage = "Access token hadn't expired yet" };
             
-            var accessTokenJti = validatedAccessToken.Id;
-            var result = await _refreshtokenService.ValidateRefreshTokenAsync(accessTokenJti, refreshToken);
+            var accessTokenJti = Guid.Parse(validatedAccessToken.Id);
+            var result = await _refreshtokenService.MakeRefreshTokenUsedAsync(refreshTokenId, accessTokenJti);
 
             if(!result.Success)
                 return result;

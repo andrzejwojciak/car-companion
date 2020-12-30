@@ -34,6 +34,12 @@ namespace carcompanion.Repositories
             return await SaveChangesAsync();
         }
 
+        public async Task<bool> RemoveRefreshTokenAsync(RefreshToken refreshToken)
+        {
+            _context.RefreshTokens.Remove(refreshToken);
+            return await SaveChangesAsync();
+        }
+
         private async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0 ? true : false;

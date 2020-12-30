@@ -22,40 +22,50 @@ namespace carcompanion.Services
             return await _refreshTokenRepository.AddRefreshTokenAsync(refreshToken);            
         }
 
-        public async Task<AuthenticationResult> ValidateRefreshTokenAsync(string accessTokenJtiString, string refreshTokenIdString)
-        {
-            var refreshTokenId = new Guid();
-            var accessTokenJti = new Guid();
-
-            try
-            {
-                refreshTokenId = Guid.Parse(refreshTokenIdString);                
-                accessTokenJti = Guid.Parse(accessTokenJtiString);
-            }
-            catch
-            {
-                return ValidationFailed("Something is wrong with your tokens");
-            }
-
-            var refreshToken = await _refreshTokenRepository.GetRefreshTokenByIdAsync(refreshTokenId);
-
-            if(refreshToken == null)
-                return ValidationFailed("This refresh token doesn't exist");
-
-            if(refreshToken.AccessTokenJti != accessTokenJti)
-                return ValidationFailed("This refresh token isn't related with this access token");
-
-            if(refreshToken.ExpirationDate < DateTime.UtcNow)
-                return ValidationFailed("This refresh token is expired");
+        public async Task<AuthenticationResult> MakeRefreshTokenUsedAsync(Guid refreshTokenId, Guid accessTokenJti)
+        {                  
+            var validationResult = await ValidateRefreshTokenAsync(refreshTokenId, accessTokenJti);            
             
-            if(refreshToken.Used)
-                return ValidationFailed("This refresh token has been used");
+            if(!validationResult.result.Success)
+                return validationResult.result;
 
-            refreshToken.Used = true;
-            if(!await _refreshTokenRepository.UpdateRefreshTokenAsync(refreshToken))
+            validationResult.refreshToken.Used = true;            
+            if(!await _refreshTokenRepository.UpdateRefreshTokenAsync(validationResult.refreshToken))
                 return ValidationFailed("Somehting went wrong");
 
             return new AuthenticationResult{ Success = true };
+        }
+
+        public async Task<AuthenticationResult> RemoveRefreshTokenAsync(Guid refreshTokenId, Guid accessTokenJti)
+        {                                   
+            var validationResult = await ValidateRefreshTokenAsync(refreshTokenId, accessTokenJti);            
+            
+            if(!validationResult.result.Success)
+                return validationResult.result;
+            
+            if(!await _refreshTokenRepository.RemoveRefreshTokenAsync(validationResult.refreshToken))
+                return ValidationFailed("Somehting went wrong");
+
+            return validationResult.result;
+        }
+        
+        private async Task<(AuthenticationResult result, RefreshToken refreshToken)> ValidateRefreshTokenAsync(Guid refreshTokenId, Guid accessTokenJti)
+        {
+            var refreshToken = await _refreshTokenRepository.GetRefreshTokenByIdAsync(refreshTokenId); 
+
+            if(refreshToken == null)
+                return (ValidationFailed("This refresh token doesn't exist"), null);
+
+            if(refreshToken.AccessTokenJti != accessTokenJti)
+                return (ValidationFailed("This refresh token isn't related with this access token"), null);
+
+            if(refreshToken.ExpirationDate < DateTime.UtcNow)
+                return (ValidationFailed("This refresh token is expired"), null);
+                
+            if(refreshToken.Used)
+                return (ValidationFailed("This refresh token has been used"), null);
+
+            return (new AuthenticationResult{ Success = true }, refreshToken);            
         }
 
         private AuthenticationResult ValidationFailed(string errorMessage)

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
 using carcompanion.Results;
+using carcompanion.Extensions;
 
 namespace carcompanion.Controllers.Security
 {
@@ -50,11 +51,14 @@ namespace carcompanion.Controllers.Security
         }     
 
         [HttpPost(Auth.Logout)]
-        public IActionResult Logout()
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
-            //TODO: Validate request and destroy refresh token
+            var result = await _authService.LogoutUserAsync(request.RefreshToken, HttpContext.GetAccessTokenJti());
+            
+            if(result.Success)
+                return StatusCode(200, new { Success = true });
 
-            return Ok("Work in progress...");
+            return StatusCode(404, result);
         }
 
         private ActionResult GenerateResponse(AuthenticationResult result)

@@ -24,9 +24,7 @@ namespace carcompanion.Mapping
             CreateMap<CreateExpenseRequest, Expense>();       
 
             CreateMap<PutExpenseRequest, Expense>();
-
-            //TODO: I lost a huge part of the day and still I don't know why 
-            //      automapper is ignoring condition and map int?: null to int?: 0
+            
             CreateMap<PatchExpenseRequest, Expense>()
                 .ForMember(dest => dest.MileageInterval, opt => opt.MapFrom((src, dest) => (src.MileageInterval == null ? dest.MileageInterval : src.MileageInterval)))                
                 .ForMember(dest => dest.Amount, opt => opt.MapFrom((src, dest) => (src.Amount == null ? dest.Amount : src.Amount)))

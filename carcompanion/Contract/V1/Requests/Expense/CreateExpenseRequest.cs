@@ -12,11 +12,16 @@ namespace carcompanion.Contract.V1.Requests.Expense
         [Range(0, 9999999999999999.99, ErrorMessage = "Value for Amount must more than 0")]
         public decimal Amount { get; set; }     
     
-        [MaxLength(256, ErrorMessage = "Value for Description can be 256 length max")]
+        [MaxLength(512, ErrorMessage = "Value for Description can be 512 length max")]
         public string Description { get; set; }                                
         
-        [Range(0, 1000000 ,ErrorMessage = "Value for MileageInterval must be between 0 and 1000000")]
+        [Range(1, 1000000 ,ErrorMessage = "Value for MileageInterval must be between 1 and 1000000")]
         public int? MileageInterval { get; set; }
+
+        [Required]
+        [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]      
+        [IsDateValid(ErrorMessage = "Value for date can't be null or less than 1970-01-01")]
+        public DateTime Date { get; set; }   
 
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
         [IsDateFuture(ErrorMessage = "Value for EndOfDateInterval must be later than today")]      

@@ -7,7 +7,7 @@ namespace carcompanion.Repositories.Interfaces
 {
     public interface ICarRepository
     {
-        Task<IEnumerable<Car>> GetUserCarsByIdAsync(Guid userId);
+        Task<IEnumerable<Car>> GetCarsByUserIdAsync(Guid userId);
         Task<bool> CreateCarAsync(Car car);
         Task<Car> GetCarByIdAsync(Guid carId);
         Task<bool> UpdateCarAsync(Car car);

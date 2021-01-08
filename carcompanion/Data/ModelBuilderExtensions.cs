@@ -14,6 +14,12 @@ namespace carcompanion.Data
                 new ExpenseCategory { ExpenseCategoryId = "fuel", Description = null, ParentId = null },       
                 new ExpenseCategory { ExpenseCategoryId = "utilization", Description = null, ParentId = null }                
             );
+
+            modelBuilder.Entity<UserCarRole>().HasData(                
+                new UserCarRole { UserCarRoleId = "owner" },                
+                new UserCarRole { UserCarRoleId = "editor" }, 
+                new UserCarRole { UserCarRoleId = "viewer" }
+            );
         }
     }
 }

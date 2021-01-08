@@ -15,6 +15,10 @@ namespace carcompanion.Data
         public DbSet<Expense> Expenses { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
+        public DbSet<ShareKey> ShareKeys { get; set; }
+        public DbSet<UserCarRole> UserCarRoles { get; set; }
+        
+        
         
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {   
@@ -29,7 +33,12 @@ namespace carcompanion.Data
                 .HasForeignKey(i => i.CarId);
                 
             modelBuilder.Entity<UserCar>()
-                .HasKey(uc => new { uc.CarId, uc.UserId});            
+                .HasKey(uc => new { uc.CarId, uc.UserId});     
+
+            modelBuilder.Entity<UserCar>()
+                .HasOne(r => r.UserCarRole)
+                .WithMany(u => u.UserCars)
+                .HasForeignKey(r => r.UserCarRoleId);       
             
             modelBuilder.Entity<Expense>()
                 .Property(p => p.Amount) 
@@ -44,6 +53,21 @@ namespace carcompanion.Data
                 .HasOne(u => u.Car)
                 .WithMany(u => u.Expenses)
                 .HasForeignKey(p => p.CarId);
+
+            modelBuilder.Entity<ShareKey>()
+                .HasOne(i => i.Issuer)
+                .WithMany(s => s.ShareKeys)
+                .HasForeignKey(i => i.IssuerId);
+
+            modelBuilder.Entity<ShareKey>()
+                .HasOne(i => i.Car)
+                .WithMany(s => s.ShareKeys)
+                .HasForeignKey(i => i.CarId);
+            
+            modelBuilder.Entity<ShareKey>()
+                .HasOne(c => c.UserCarRole)
+                .WithMany(s => s.ShareKeys)
+                .HasForeignKey(c => c.UserCarRoleId);
                         
             modelBuilder.Seed();      
         }

@@ -41,12 +41,11 @@ namespace carcompanion.Repositories
             return car;
         }
 
-        public async Task<IEnumerable<Car>> GetUserCarsByIdAsync(Guid userId)
+        public async Task<IEnumerable<Car>> GetCarsByUserIdAsync(Guid userId)
         {
-            var cars = await _context.UserCars
-                                .Include(c => c.Car)
-                                .Where(u => u.UserId == userId) 
-                                .Select(c => c.Car)
+            var cars = await _context.Cars
+                                .Include(u => u.UserCars)
+                                .Where(u => u.UserCars.Any(u => u.UserId == userId))
                                 .ToListAsync();
 
             return cars;

@@ -38,7 +38,7 @@ namespace carcompanion.Services
             if(!await _carRepository.CreateCarAsync(car))
                 return FailResult(400, "Couldn't create a car");
 
-            var userCar = new UserCar { UserId = userId, CarId = car.CarId};            
+            var userCar = new UserCar { UserId = userId, CarId = car.CarId, UserCarRoleId = "Owner"};            
             if(!await _userCarRepository.CreateUserCarAsync(userCar))
                 return FailResult(400, "Couldn't create a car");            
 
@@ -47,12 +47,19 @@ namespace carcompanion.Services
 
         public async Task<ServiceResult> GetCarsByUserIdAsync(Guid userId)
         {
-            var cars = await _carRepository.GetUserCarsByIdAsync(userId);
+            var cars = await _carRepository.GetCarsByUserIdAsync(userId);
 
             if(cars == null)
                 return FailResult(404, "User doesn't have any car");
+                        
+            var userCars = cars.SelectMany(u => u.UserCars.Where(i => i.UserId == userId));
+            var carsResponse = _mapper.Map<IEnumerable<GetCarByIdResponse>>(cars);  
+
+            foreach(var car in carsResponse)
+            {
+                car.UserCarRole = userCars.First(c => c.CarId == car.CarId).UserCarRoleId;
+            }
             
-            var carsResponse = _mapper.Map<IEnumerable<GetCarByIdResponse>>(cars);            
             var response = new GetUserCarsResponse{ UserId = userId.ToString(), Cars = carsResponse};
             return SuccessResult(200, response);
         }
@@ -64,10 +71,13 @@ namespace carcompanion.Services
             if(car == null)
                 return FailResult(404, "Car doesn't exist");
             
-            if(car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)
+            var userCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);
+            if(userCar == null)
                 return FailResult(401, "Car doesn't belong to this user");
             
-            return SuccessResult(200, _mapper.Map<GetCarByIdResponse>(car));
+            var response = _mapper.Map<GetCarByIdResponse>(car);
+            _mapper.Map(userCar, response);
+            return SuccessResult(200, response);
         }
 
         public async Task<ServiceResult> UpdateCarByIdAsync(Guid userId, Guid carId, IUpdateCarRequest request)
@@ -96,8 +106,8 @@ namespace carcompanion.Services
                 return FailResult(404, "Car doesn't exist");
             
             var userCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);
-            if(userCar == null)
-                return FailResult(401, "Car doesn't belong to this user");
+            if(userCar == null || !userCar.UserCarRoleId.Equals("Owner"))
+                return FailResult(401, "User can't delete this car");
             
             if(!await _carRepository.DeleteCarAsync(car))
                 return FailResult(500, "Failed while deleting car");

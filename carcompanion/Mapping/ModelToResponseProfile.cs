@@ -19,6 +19,9 @@ namespace carcompanion.Mapping
             CreateMap<Car, CreateCarResponse>();
             CreateMap<Car, GetCarByIdResponse>();
             CreateMap<Car, UpdateCarResponse>();
+            CreateMap<UserCar, GetCarByIdResponse>()
+                .ForMember(dest => dest.UserCarRole, opt => opt.MapFrom(src => src.UserCarRoleId));
+                
 
             CreateMap<ExpenseCategory, ExpenseCategoryResponse>();
         }

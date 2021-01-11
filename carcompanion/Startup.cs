@@ -106,13 +106,16 @@ namespace carcompanion
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRefreshtokenService, RefreshtokenService>();
+            services.AddScoped<IShareCarService, ShareCarService>();
             services.AddScoped<IJwtManager, JwtManager>();
             
             services.AddTransient<IExpenseRepository, ExpenseRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
             services.AddTransient<IUserCarRepository, UserCarRepository>();
             services.AddTransient<IUserRepository, UserRepository>();
-            services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
+            services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();            
+            services.AddTransient<IShareKeyRepository, ShareKeyRepository>();
+
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();           
         }

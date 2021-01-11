@@ -6,7 +6,7 @@ namespace carcompanion.Contract.V1
         public const  string Root = "api";
         private const  string Version = "v1";
         private const  string Base = Root + "/" + Version;
-
+        
         public static class Cars
         {
             public const string CreateCar = Base + "/cars";   
@@ -15,6 +15,7 @@ namespace carcompanion.Contract.V1
             public const string PutCar = Base + "/cars/{carId}";
             public const string PatchCar = Base + "/cars/{carId}";
             public const string DeleteCar = Base + "/cars/{carId}";
+            public const string ShareCar = Base + "/cars/{carId}/share";
         }
         
         public static class Expenses
@@ -27,5 +28,11 @@ namespace carcompanion.Contract.V1
             public const string PatchCarExpense = Base + "/cars/{carId}/expenses/{expenseId}";
             public const string GetCategories = Base + "/cars/expenses/categories";
         }        
+
+        public static class ShareCar 
+        {
+            public const string CreateShareKey = Base + "/cars/{carId}/share";
+            public const string UseShareKey = Base + "/cars/use-sharekey/{shareKeyId}";
+        }
     }
 }

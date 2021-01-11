@@ -38,7 +38,7 @@ namespace carcompanion.Services
             if(!await _carRepository.CreateCarAsync(car))
                 return FailResult(400, "Couldn't create a car");
 
-            var userCar = new UserCar { UserId = userId, CarId = car.CarId, UserCarRoleId = "Owner"};            
+            var userCar = new UserCar { UserId = userId, CarId = car.CarId, UserCarRoleId = "owner"};            
             if(!await _userCarRepository.CreateUserCarAsync(userCar))
                 return FailResult(400, "Couldn't create a car");            
 

@@ -20,6 +20,7 @@ namespace carcompanion.Models
         public DateTime AddedDate { get; set; }
 
         public ICollection<Expense> Expenses { get; set; }
+        public ICollection<ShareKey> ShareKeys { get; set; }
         public ICollection<UserCar> UserCars { get; set; }
         
         

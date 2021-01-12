@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using carcompanion.Contract.V1.Responses.Interfaces;
 
 namespace carcompanion.Contract.V1.Responses.Car
@@ -13,6 +14,6 @@ namespace carcompanion.Contract.V1.Responses.Car
         public string Plate { get; set; }
         public int Mileage { get; set; }        
         public int ProductionYear { get; set; }      
-        public string UserCarRole { get; set; }
+        public IEnumerable<CarUserResponse> Users { get; set; }
     }
 }

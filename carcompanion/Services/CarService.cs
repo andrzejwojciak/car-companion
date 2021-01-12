@@ -52,12 +52,13 @@ namespace carcompanion.Services
             if(cars == null)
                 return FailResult(404, "User doesn't have any car");
                         
-            var userCars = cars.SelectMany(u => u.UserCars.Where(i => i.UserId == userId));
-            var carsResponse = _mapper.Map<IEnumerable<GetCarByIdResponse>>(cars);  
-
-            foreach(var car in carsResponse)
+            var carsResponse = new List<GetCarByIdResponse>();  
+            
+            foreach(var car in cars)
             {
-                car.UserCarRole = userCars.First(c => c.CarId == car.CarId).UserCarRoleId;
+                var carResponse = _mapper.Map<GetCarByIdResponse>(car);
+                carResponse.Users = GenerateCarUsersResponse(car);
+                carsResponse.Add(carResponse);
             }
             
             var response = new GetUserCarsResponse{ UserId = userId.ToString(), Cars = carsResponse};
@@ -71,12 +72,12 @@ namespace carcompanion.Services
             if(car == null)
                 return FailResult(404, "Car doesn't exist");
             
-            var userCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);
-            if(userCar == null)
+            if(car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)
                 return FailResult(401, "Car doesn't belong to this user");
             
             var response = _mapper.Map<GetCarByIdResponse>(car);
-            _mapper.Map(userCar, response);
+            response.Users = GenerateCarUsersResponse(car);
+
             return SuccessResult(200, response);
         }
 
@@ -115,6 +116,22 @@ namespace carcompanion.Services
             return SuccessResult(200, new DeleteCarResponse { CarDeleted = true});
 
         }
+
+        private ICollection<CarUserResponse> GenerateCarUsersResponse(Car car)
+        {               
+            var userCars = car.UserCars;
+            var carUsersResponse = new List<CarUserResponse>();
+
+            foreach(var userCar in userCars)
+            {
+                carUsersResponse.Add( new CarUserResponse{ 
+                    Email = userCar.User.Email, 
+                    Role = userCar.UserCarRoleId }
+                    );
+            }
+
+            return (ICollection<CarUserResponse>)carUsersResponse;
+        } 
 
         private ServiceResult FailResult(int statusCode, string ErrorMessage)
         {

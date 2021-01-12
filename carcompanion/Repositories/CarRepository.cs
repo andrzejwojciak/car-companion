@@ -36,6 +36,7 @@ namespace carcompanion.Repositories
             var car = await _context.Cars
                                 .Include(e => e.Expenses)
                                 .Include(u => u.UserCars)
+                                    .ThenInclude(u => u.User)
                                 .FirstOrDefaultAsync(i => i.CarId == carId);
 
             return car;
@@ -45,6 +46,7 @@ namespace carcompanion.Repositories
         {
             var cars = await _context.Cars
                                 .Include(u => u.UserCars)
+                                    .ThenInclude(u => u.User)
                                 .Where(u => u.UserCars.Any(u => u.UserId == userId))
                                 .ToListAsync();
 

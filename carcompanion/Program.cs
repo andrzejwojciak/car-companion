@@ -34,7 +34,7 @@ namespace carcompanion
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Something went wrong, trying again");
+                    Console.WriteLine("Something went wrong while applying migrations, trying again");
                     DbReadyToGo = false;
                     Thread.Sleep(4000);
                 }

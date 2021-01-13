@@ -9,6 +9,7 @@ namespace carcompanion.Services.Interfaces
     {
         Task<AuthenticationResult> RegisterUserAsync(RegisterRequest request);
         Task<AuthenticationResult> LoginUserAsync(LoginRequest request);
+        Task<AuthenticationResult> AuthWithFacebookAsync(AuthWithFacebookRequest request);
         Task<AuthenticationResult> RefreshTokenAsync(RefreshTokenRequest request);
         Task<LogoutResult> LogoutUserAsync(Guid refreshToken, Guid accessTokenJti);
     }

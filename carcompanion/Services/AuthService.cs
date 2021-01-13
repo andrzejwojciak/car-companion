@@ -21,9 +21,16 @@ namespace carcompanion.Services
         private readonly IJwtManager _jwtManager;
         private readonly IUserRepository _userRepository;
         private readonly IRefreshtokenService _refreshTokenService;
+        private readonly IFacebookAuthService _facebookAuthService;
 
-        public AuthService(IPasswordHasher hasher, IMapper mapper, IJwtManager jwtManager, IUserRepository userRepository, IRefreshtokenService refreshTokenService)
+        public AuthService(IPasswordHasher hasher,
+                           IMapper mapper,
+                           IJwtManager jwtManager,
+                           IUserRepository userRepository,
+                           IRefreshtokenService refreshTokenService,
+                           IFacebookAuthService facebookAuthService)
         {
+            _facebookAuthService = facebookAuthService;
             _hasher = hasher;
             _mapper = mapper;
             _jwtManager = jwtManager;
@@ -33,12 +40,12 @@ namespace carcompanion.Services
 
         public async Task<AuthenticationResult> RegisterUserAsync(RegisterRequest request)
         {
-            if(await UserExistsByEmailAsync(request.Email))
+            if (await UserExistsByEmailAsync(request.Email))
                 return AuthFailed("User already exists");
             
             var user = _mapper.Map<User>(request);
             
-            if(!await AddUserAsync(user))
+            if (!await AddUserAsync(user))
                 return AuthFailed("Something went wrong");
             
             return await _jwtManager.AuthenticateUserAsync(user);
@@ -55,6 +62,26 @@ namespace carcompanion.Services
                 return AuthFailed("Login or password is wrong.");
             
             return await _jwtManager.AuthenticateUserAsync(user);
+        }
+
+        public async Task<AuthenticationResult> AuthWithFacebookAsync(AuthWithFacebookRequest request)
+        {            
+            var fbAuthResult = await _facebookAuthService.AuthUserByFbTokenAsync(request.AccessToken);        
+
+            if (!fbAuthResult.Success)
+                return AuthFailed(fbAuthResult.ErrorMessage);
+
+            var user = await _userRepository.GetUserByEmailAsync(fbAuthResult.Email);
+
+            if (user != null)
+                return await _jwtManager.AuthenticateUserAsync(user);
+
+            var newUser = new User { Email = fbAuthResult.Email, EmailConfirmed = true };    
+
+            if (!await AddUserAsync(newUser))
+                return AuthFailed("Somehting went wrong");                
+
+            return await _jwtManager.AuthenticateUserAsync(newUser);
         }
         
         public async Task<AuthenticationResult> RefreshTokenAsync(RefreshTokenRequest request)

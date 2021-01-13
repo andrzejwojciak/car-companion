@@ -41,6 +41,14 @@ namespace carcompanion.Controllers.Security
             var result = await _authService.LoginUserAsync(request);
             return GenerateResponse(result);             
         }
+
+        [AllowAnonymous]
+        [HttpPost(Auth.AuthWithFacebook)]
+        public async Task<IActionResult> AuthWithFacebook([FromBody] AuthWithFacebookRequest request)
+        {
+            var result = await _authService.AuthWithFacebookAsync(request);
+            return GenerateResponse(result);
+        }
         
         [AllowAnonymous]
         [HttpPost(Auth.Refresh)]

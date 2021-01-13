@@ -18,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Swashbuckle.AspNetCore.Swagger;
 
 namespace carcompanion
 {
@@ -36,7 +35,12 @@ namespace carcompanion
         {
             var jwtSettings = new JwtSettings();
             Configuration.Bind(nameof(jwtSettings), jwtSettings);
+            
+            var facebookAuthSettings = new FacebookAuthSettings();
+            Configuration.Bind(nameof(facebookAuthSettings), facebookAuthSettings);
+
             services.AddSingleton(jwtSettings);
+            services.AddSingleton(facebookAuthSettings);
             
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("Database")));
@@ -107,6 +111,7 @@ namespace carcompanion
             services.AddScoped<IAuthService, AuthService>();
             services.AddScoped<IRefreshtokenService, RefreshtokenService>();
             services.AddScoped<IShareCarService, ShareCarService>();
+            services.AddScoped<IFacebookAuthService, FacebookAuthService>();
             services.AddScoped<IJwtManager, JwtManager>();
             
             services.AddTransient<IExpenseRepository, ExpenseRepository>();
@@ -116,8 +121,9 @@ namespace carcompanion
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();            
             services.AddTransient<IShareKeyRepository, ShareKeyRepository>();
 
+            services.AddSingleton<IPasswordHasher, PasswordHasher>();          
 
-            services.AddSingleton<IPasswordHasher, PasswordHasher>();           
+            services.AddHttpClient();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

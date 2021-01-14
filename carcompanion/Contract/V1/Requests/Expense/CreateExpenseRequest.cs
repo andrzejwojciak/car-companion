@@ -20,7 +20,7 @@ namespace carcompanion.Contract.V1.Requests.Expense
 
         [Required]
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]      
-        [IsDateValid(ErrorMessage = "Value for date can't be null or less than 1970-01-01")]
+        [IsDateValid(ErrorMessage = "Value for date can't be null or less than 1970-01-01, porper format is {yyyy-MM-dd}")]
         public DateTime Date { get; set; }   
 
         [DataType(DataType.Date), DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]

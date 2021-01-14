@@ -114,8 +114,18 @@ namespace carcompanion.Services
                 return FailResult(500, "Failed while deleting car");
             
             return SuccessResult(200, new DeleteCarResponse { CarDeleted = true});
-
         }
+
+        // public void UserHasCar(Guid carId, Guid userId)
+        // {
+        //     var car = await _carRepository.GetCarByIdAsync(carId);
+
+        //     if(car == null)
+        //         return FailResult(404, "Car doesn't exist");
+            
+        //     if(car.UserCars.FirstOrDefault(u => u.UserId == userId) == null)
+        //         return FailResult(401, "Car doesn't belong to this user");            
+        // }
 
         private ICollection<CarUserResponse> GenerateCarUsersResponse(Car car)
         {               

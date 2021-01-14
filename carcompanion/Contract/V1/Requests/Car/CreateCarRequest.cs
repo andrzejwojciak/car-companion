@@ -23,9 +23,10 @@ namespace carcompanion.Contract.V1.Requests.Car
         public string Plate { get; set; }        
 
         [Range(0, 5000000, ErrorMessage = "Value for Mileage must be between 0 and 5000000")]
-        public int Mileage { get; set; }        
+        public int? Mileage { get; set; }        
         
-        [Range(1900, 3000, ErrorMessage = "Value for ProductionYear must be between 1900 and 3000")]
+        [Range(1000, 6000, ErrorMessage = "Value for ProductionYear must be between 10000 and 6000")]
+        [Required]
         public int ProductionYear { get; set; }             
     }
 }

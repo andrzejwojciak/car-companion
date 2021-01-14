@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using carcompanion.Data;
 using carcompanion.Models;
@@ -49,10 +50,17 @@ namespace carcompanion.Repositories
         {
             return await _context.ExpenseCategories.ToListAsync();
         }
+      
+        public async Task<List<Expense>> GetExpensesByCarIdAsync(Guid carId, DateTime startDate, DateTime endDate)
+        {
+            var expenses = await _context.Expenses.Where(c => c.CarId == carId && c.Date >= startDate && c.Date <= endDate).ToListAsync();
+            return expenses;
+        }
 
         private async Task<bool> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync() > 0 ? true : false;
         }
+
     }
 }

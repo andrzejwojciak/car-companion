@@ -113,6 +113,7 @@ namespace carcompanion
             services.AddScoped<IShareCarService, ShareCarService>();
             services.AddScoped<IFacebookAuthService, FacebookAuthService>();
             services.AddScoped<IJwtManager, JwtManager>();
+            services.AddScoped<ISummaryService, SummaryService>();
             
             services.AddTransient<IExpenseRepository, ExpenseRepository>();
             services.AddTransient<ICarRepository, CarRepository>();

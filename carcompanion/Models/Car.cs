@@ -18,7 +18,7 @@ namespace carcompanion.Models
         public string Model { get; set; }
         public string Generation { get; set; }
         public string Plate { get; set; }
-        public int Mileage { get; set; }        
+        public int? Mileage { get; set; }        
         public int ProductionYear { get; set; }             
         public DateTime AddedDate { get; set; }
 

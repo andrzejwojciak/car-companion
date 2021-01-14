@@ -44,8 +44,5 @@ namespace carcompanion.Controllers.V1
                         
             return StatusCode(result.StatusCode, result.ResponseData);
         }
-
-
-        
     }
 }

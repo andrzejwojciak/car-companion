@@ -29,6 +29,11 @@ namespace carcompanion.Contract.V1
             public const string GetCategories = Base + "/cars/expenses/categories";
         }        
 
+        public static class Summary 
+        {
+            public const string GetSummaryForCar = Base + "/cars/{carId}/summary";
+        }
+
         public static class ShareCar 
         {
             public const string CreateShareKey = Base + "/cars/{carId}/share";

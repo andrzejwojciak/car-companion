@@ -104,7 +104,7 @@ namespace carcompanion.Services
 
             var userCar = car.UserCars.FirstOrDefault(u => u.UserId == userId);
 
-            if (userCar == null || !userCar.UserCarRoleId.Equals("Owner"))
+            if (userCar == null || !userCar.UserCarRoleId.Equals("owner"))
                 return FailResult(401, "User can't delete this car");
 
             if (!await _carRepository.DeleteCarAsync(car))

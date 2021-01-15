@@ -13,13 +13,12 @@ namespace carcompanion.Models
         public Guid IssuerId { get; set; }
         public Guid CarId { get; set; }
         public string UserCarRoleId { get; set; }
-        public bool Used { get; set; }      
+        public bool Used { get; set; }
         public DateTime AddedDate { get; set; }
-        
-                 
-        
-        public User Issuer { get; set; }   
-        public Car Car { get; set; }     
+
+
+        public User Issuer { get; set; }
+        public Car Car { get; set; }
         public UserCarRole UserCarRole { get; set; }
     }
 }

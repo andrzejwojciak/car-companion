@@ -5,10 +5,9 @@ namespace carcompanion.Models
 {
     public class UserCarRole
     {
-        [Key]
-        public string UserCarRoleId { get; set; }  
+        [Key] public string UserCarRoleId { get; set; }
 
-        public ICollection<UserCar> UserCars { get; set; }        
+        public ICollection<UserCar> UserCars { get; set; }
         public ICollection<ShareKey> ShareKeys { get; set; }
     }
 }

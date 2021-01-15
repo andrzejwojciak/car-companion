@@ -12,6 +12,5 @@ namespace carcompanion.Repositories.Interfaces
         Task<Car> GetCarByIdAsync(Guid carId);
         Task<bool> UpdateCarAsync(Car car);
         Task<bool> DeleteCarAsync(Car car);
-
     }
 }

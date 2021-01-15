@@ -16,8 +16,8 @@ namespace carcompanion.Repositories
         public CarRepository(ApplicationDbContext context)
         {
             _context = context;
-            
         }
+
         public async Task<bool> CreateCarAsync(Car car)
         {
             await _context.Cars.AddAsync(car);
@@ -34,10 +34,10 @@ namespace carcompanion.Repositories
         public async Task<Car> GetCarByIdAsync(Guid carId)
         {
             var car = await _context.Cars
-                                .Include(e => e.Expenses)
-                                .Include(u => u.UserCars)
-                                    .ThenInclude(u => u.User)
-                                .FirstOrDefaultAsync(i => i.CarId == carId);
+                .Include(e => e.Expenses)
+                .Include(u => u.UserCars)
+                .ThenInclude(u => u.User)
+                .FirstOrDefaultAsync(i => i.CarId == carId);
 
             return car;
         }
@@ -45,10 +45,10 @@ namespace carcompanion.Repositories
         public async Task<IEnumerable<Car>> GetCarsByUserIdAsync(Guid userId)
         {
             var cars = await _context.Cars
-                                .Include(u => u.UserCars)
-                                    .ThenInclude(u => u.User)
-                                .Where(u => u.UserCars.Any(u => u.UserId == userId))
-                                .ToListAsync();
+                .Include(u => u.UserCars)
+                .ThenInclude(u => u.User)
+                .Where(u => u.UserCars.Any(userCar => userCar.UserId == userId))
+                .ToListAsync();
 
             return cars;
         }
@@ -61,7 +61,7 @@ namespace carcompanion.Repositories
 
         private async Task<bool> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync() > 0 ? true : false;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

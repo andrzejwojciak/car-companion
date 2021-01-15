@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using carcompanion.Contract.V1.Responses.Expense;
 using carcompanion.Contract.V1.Responses.Interfaces;
 using carcompanion.Contract.V1.Responses.Summary;
 using carcompanion.Models;
@@ -20,15 +19,15 @@ namespace carcompanion.Services
         {
             _expenseRepository = expenseRepository;
         }
-        
+
         public async Task<ServiceResult> GetSummaryByCarIdAsync(Guid carId, DateTime startDate, DateTime endDate)
         {
-            if(startDate > endDate)
-                return FailedResult("endDate can't be later than starDate", 400); 
+            if (startDate > endDate)
+                return FailedResult("endDate can't be later than starDate", 400);
 
-            var expenses = await _expenseRepository.GetExpensesByCarIdAsync(carId, startDate, endDate); 
+            var expenses = await _expenseRepository.GetExpensesByCarIdAsync(carId, startDate, endDate);
 
-            if(expenses == null)
+            if (expenses == null)
                 FailedResult("Car doesn't have any expenses", 404);
 
             var response = GenerateGetSummaryByCarId(expenses);
@@ -37,36 +36,37 @@ namespace carcompanion.Services
 
         private GetSummaryByCarIdResponse GenerateGetSummaryByCarId(IList<Expense> expenses)
         {
-            var response = new GetSummaryByCarIdResponse{ExpensesCount = expenses.Count()};        
+            var response = new GetSummaryByCarIdResponse {ExpensesCount = expenses.Count()};
 
-            foreach( var expense in expenses )
+            foreach (var expense in expenses)
             {
                 response.ExpensesTotalAmount += expense.Amount;
 
-                var categorySummary = response.CategoriesSummary.SingleOrDefault(c => c.CategoryName == expense.Category);
+                var categorySummary =
+                    response.CategoriesSummary.SingleOrDefault(c => c.CategoryName == expense.Category);
                 if (categorySummary == null)
                 {
-                    var newCategorySumary = new CategorySummary { CategoryName = expense.Category, CategoryExpensesCount = 1, CategoryTotalAmount = expense.Amount};
-                    response.CategoriesSummary.Add(newCategorySumary);
+                    var newCategorySummary = new CategorySummary
+                    {
+                        CategoryName = expense.Category, CategoryExpensesCount = 1, CategoryTotalAmount = expense.Amount
+                    };
+                    response.CategoriesSummary.Add(newCategorySummary);
                 }
                 else
                 {
-                    categorySummary.CategoryExpensesCount ++;
+                    categorySummary.CategoryExpensesCount++;
                     categorySummary.CategoryTotalAmount += expense.Amount;
                 }
-            }            
-            
+            }
+
             return response;
         }
-        
-        private ServiceResult FailedResult(string errorMessage, int? statusCode)
-        {
-            return new ServiceResult { Success = false, ErrorMessage = errorMessage, StatusCode = statusCode != null ? (int)statusCode : 400};
-        }
-        
-        private ServiceResult SuccessResult(IResponseData response, int? statusCode)
-        {
-            return new ServiceResult { Success = true, ResponseData = response, StatusCode = statusCode != null ? (int)statusCode : 200};
-        }
+
+        private static ServiceResult FailedResult(string errorMessage, int statusCode)
+            => new ServiceResult
+                {Success = false, Status = statusCode, ErrorMessage = errorMessage};
+
+        private static ServiceResult SuccessResult(IResponseData responseData, int statusCode)
+            => new ServiceResult {Success = true, Status = statusCode, ResponseData = responseData};
     }
 }

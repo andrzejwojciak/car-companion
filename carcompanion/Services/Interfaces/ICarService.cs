@@ -2,7 +2,6 @@ using carcompanion.Contract.V1.Requests.Car;
 using carcompanion.Models;
 using carcompanion.Results;
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace carcompanion.Services.Interfaces

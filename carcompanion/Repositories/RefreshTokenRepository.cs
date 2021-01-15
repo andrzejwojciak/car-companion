@@ -13,7 +13,7 @@ namespace carcompanion.Repositories
 
         public RefreshTokenRepository(ApplicationDbContext context)
         {
-            _context = context;            
+            _context = context;
         }
 
         public async Task<bool> AddRefreshTokenAsync(RefreshToken refreshToken)
@@ -24,7 +24,8 @@ namespace carcompanion.Repositories
 
         public async Task<RefreshToken> GetRefreshTokenByIdAsync(Guid refreshTokenId)
         {
-            var refreshToken = await _context.RefreshTokens.FirstOrDefaultAsync(i => i.RefreshTokenId == refreshTokenId);
+            var refreshToken =
+                await _context.RefreshTokens.FirstOrDefaultAsync(i => i.RefreshTokenId == refreshTokenId);
             return refreshToken;
         }
 
@@ -42,7 +43,7 @@ namespace carcompanion.Repositories
 
         private async Task<bool> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync() > 0 ? true : false;
+            return await _context.SaveChangesAsync() > 0;
         }
     }
 }

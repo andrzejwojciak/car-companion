@@ -15,7 +15,7 @@ namespace carcompanion.Repositories
 
         public ExpenseRepository(ApplicationDbContext context)
         {
-            _context = context;            
+            _context = context;
         }
 
         public async Task<bool> CreateExpenseAsync(Expense expense)
@@ -27,10 +27,10 @@ namespace carcompanion.Repositories
         public async Task<Expense> GetExpenseByIdAsync(Guid expenseId)
         {
             var expense = await _context.Expenses
-                    .Include(e => e.Car)
-                        .ThenInclude(u => u.UserCars)
-                    .FirstOrDefaultAsync( u => u.ExpenseId == expenseId);
-                    
+                .Include(e => e.Car)
+                .ThenInclude(u => u.UserCars)
+                .FirstOrDefaultAsync(u => u.ExpenseId == expenseId);
+
             return expense;
         }
 
@@ -39,28 +39,28 @@ namespace carcompanion.Repositories
             _context.Expenses.Remove(expense);
             return await SaveChangesAsync();
         }
-        
+
         public async Task<bool> UpdateExpenseAsync(Expense expense)
         {
             _context.Expenses.Update(expense);
             return await SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<ExpenseCategory>> GetExpenseCatagoriesAsync()
+        public async Task<IEnumerable<ExpenseCategory>> GetExpenseCategoriesAsync()
         {
             return await _context.ExpenseCategories.ToListAsync();
         }
-      
+
         public async Task<List<Expense>> GetExpensesByCarIdAsync(Guid carId, DateTime startDate, DateTime endDate)
         {
-            var expenses = await _context.Expenses.Where(c => c.CarId == carId && c.Date >= startDate && c.Date <= endDate).ToListAsync();
+            var expenses = await _context.Expenses
+                .Where(c => c.CarId == carId && c.Date >= startDate && c.Date <= endDate).ToListAsync();
             return expenses;
         }
 
         private async Task<bool> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync() > 0 ? true : false;
+            return await _context.SaveChangesAsync() > 0;
         }
-
     }
 }

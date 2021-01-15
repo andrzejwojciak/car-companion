@@ -12,8 +12,7 @@ namespace carcompanion.Models
             EmailConfirmed = false;
         }
 
-        [Key]
-        public Guid UserId { get; set; }
+        [Key] public Guid UserId { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
         public bool EmailConfirmed { get; set; }
@@ -22,7 +21,5 @@ namespace carcompanion.Models
         public ICollection<Expense> Expenses { get; set; }
         public ICollection<ShareKey> ShareKeys { get; set; }
         public ICollection<UserCar> UserCars { get; set; }
-        
-        
     }
 }

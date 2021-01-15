@@ -36,7 +36,7 @@ namespace carcompanion.Repositories
 
         private async Task<bool> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync() > 0 ? true : false;
+            return await _context.SaveChangesAsync() > 0 ;
         }
     }
 }

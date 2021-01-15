@@ -25,11 +25,10 @@ namespace carcompanion.Repositories
             _context.UserCars.Remove(userCar);
             return await SaveChangesAsync();
         }
-        
+
         private async Task<bool> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync() > 0 ? true : false; 
+            return await _context.SaveChangesAsync() > 0;
         }
-        
     }
 }

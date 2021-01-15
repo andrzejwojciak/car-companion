@@ -24,7 +24,7 @@ namespace carcompanion.Controllers.V1
             _carService = carService;
             _mapper = mapper;
         }
-        
+
         [HttpPost(Cars.CreateCar)]
         public async Task<ActionResult> Create(CreateCarRequest request)
         {
@@ -37,14 +37,14 @@ namespace carcompanion.Controllers.V1
         {
             var result = await _carService.GetCarsByUserIdAsync(HttpContext.GetUserId());
             return GenreateResponse(result);
-        }        
+        }
 
         [HttpGet(Cars.GetCarById)]
         public async Task<ActionResult> GetCar([FromRoute] Guid carId)
         {
-            var result = await _carService.GetCarByIdAsync(HttpContext.GetUserId(), carId); 
+            var result = await _carService.GetCarByIdAsync(HttpContext.GetUserId(), carId);
             return GenreateResponse(result);
-        }        
+        }
 
         [HttpPut(Cars.PutCar)]
         public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
@@ -59,21 +59,17 @@ namespace carcompanion.Controllers.V1
             var result = await _carService.UpdateCarByIdAsync(HttpContext.GetUserId(), carId, request);
             return GenreateResponse(result);
         }
-        
+
         [HttpDelete(Cars.DeleteCar)]
         public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
-        {            
+        {
             var result = await _carService.DeleteCarByIdAsync(HttpContext.GetUserId(), carId);
             return GenreateResponse(result);
         }
 
-        private ActionResult GenreateResponse(ServiceResult result)
-        {
-            if(!result.Success)
-                return StatusCode(result.StatusCode, result.ErrorMessage);            
-
-            return StatusCode(result.StatusCode, result.ResponseData);
-        }
-
+        private ActionResult GenreateResponse(ServiceResult result) =>
+            !result.Success
+                ? StatusCode(result.Status, result.ErrorMessage)
+                : StatusCode(result.Status, result.ResponseData);
     }
 }

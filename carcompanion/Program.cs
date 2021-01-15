@@ -19,7 +19,7 @@ namespace carcompanion
         {
             var host = CreateHostBuilder(args).Build();
 
-            bool DbReadyToGo;
+            bool dbReadyToGo;
 
             do
             {
@@ -30,16 +30,16 @@ namespace carcompanion
                         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                         db.Database.Migrate();
                     }
-                    DbReadyToGo = true;
+                    dbReadyToGo = true;
                 }
                 catch (Exception)
                 {
                     Console.WriteLine("Something went wrong while applying migrations, trying again");
-                    DbReadyToGo = false;
+                    dbReadyToGo = false;
                     Thread.Sleep(4000);
                 }
 
-            } while (DbReadyToGo == false);
+            } while (dbReadyToGo == false);
 
             host.Run();
         }

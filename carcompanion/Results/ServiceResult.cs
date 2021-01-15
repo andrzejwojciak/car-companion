@@ -1,4 +1,3 @@
-using carcompanion.Contract.V1.Responses.Expense;
 using carcompanion.Contract.V1.Responses.Interfaces;
 
 namespace carcompanion.Results
@@ -7,45 +6,23 @@ namespace carcompanion.Results
     {
         private string _errorMessage;
         private int _statusCode;
-        public bool Success { get; set; }     
-        public IResponseData ResponseData { get; set; }  
+        public bool Success { get; set; }
+        public IResponseData ResponseData { get; set; }
 
-        public string ErrorMessage 
-        { 
+        public string ErrorMessage
+        {
+            get => _errorMessage ?? "Something went wrong";
+            set => _errorMessage = value;
+        }
+
+        public int Status
+        {
             get
             {
-                if(_errorMessage == null)
-                    return "Something went wrong";
-                
-                return _errorMessage;
+                if (_statusCode != 0) return _statusCode;
+                return Success ? 200 : 500;
             }
-            set
-            {
-                _errorMessage = value;
-            } 
-        }            
-
-        public int StatusCode 
-        { 
-            get
-            {
-                if(_statusCode == 0)
-                {
-                    if(Success) 
-                    {
-                        return 200;
-                    } else 
-                    {
-                        return 500;
-                    }
-                }
-                
-                return _statusCode;
-            }
-            set
-            {
-                _statusCode = value;
-            } 
+            set => _statusCode = value;
         }
     }
 }

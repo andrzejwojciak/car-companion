@@ -15,14 +15,15 @@ namespace carcompanion.Controllers.V1
     public class ShareCarController : ControllerBase
     {
         private readonly IShareCarService _shareCarService;
-        
+
         public ShareCarController(IShareCarService shareCarService)
         {
-            _shareCarService = shareCarService;            
+            _shareCarService = shareCarService;
         }
-        
+
         [HttpPost(ShareCar.CreateShareKey)]
-        public async Task<IActionResult> CreateShareKey([FromBody] CreateShareKeyRequest request, [FromRoute] Guid carId)
+        public async Task<IActionResult> CreateShareKey([FromBody] CreateShareKeyRequest request,
+            [FromRoute] Guid carId)
         {
             var result = await _shareCarService.CreateShareKeyAsync(carId, HttpContext.GetUserId(), request.Role);
             return GenerateResponse(result);
@@ -36,13 +37,8 @@ namespace carcompanion.Controllers.V1
         }
 
         private ActionResult GenerateResponse(ServiceResult result)
-        {
-            if(!result.Success)
-            {
-                return StatusCode(result.StatusCode, result.ErrorMessage);
-            }
-                        
-            return StatusCode(result.StatusCode, result.ResponseData);
-        }
+            => !result.Success
+                ? StatusCode(result.Status, result.ErrorMessage)
+                : StatusCode(result.Status, result.ResponseData);
     }
 }

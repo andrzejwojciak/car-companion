@@ -12,8 +12,7 @@ namespace carcompanion.Services
         private const string DebugFbTokenUrl =
             "https://graph.facebook.com/debug_token?input_token={0}&access_token={1}|{2}"; //access_token to verify, app_id, secret_id ;
 
-        private const string
-            ReadFbUserInfoUrl = "https://graph.facebook.com/me?fields=email&access_token={0}"; //access_token
+        private const string ReadFbUserInfoUrl = "https://graph.facebook.com/me?fields=email&access_token={0}"; //access_token
 
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly FacebookAuthSettings _facebookAuthSettings;

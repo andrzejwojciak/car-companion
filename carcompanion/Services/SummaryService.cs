@@ -14,13 +14,16 @@ namespace carcompanion.Services
     public class SummaryService : ISummaryService
     {
         private readonly IExpenseRepository _expenseRepository;
+        private readonly ICarRepository _carRepository;
 
-        public SummaryService(IExpenseRepository expenseRepository)
+        public SummaryService(IExpenseRepository expenseRepository, ICarRepository carRepository)
         {
             _expenseRepository = expenseRepository;
+            _carRepository = carRepository;
         }
 
-        public async Task<ServiceResult> GetSummaryByCarIdAsync(Guid carId, DateTime startDate, DateTime endDate)
+        public async Task<ServiceResult> GetSummaryByCarIdAsync(Guid carId, Guid userId, DateTime startDate,
+            DateTime endDate)
         {
             if (startDate > endDate)
                 return FailedResult("endDate can't be later than starDate", 400);
@@ -34,7 +37,14 @@ namespace carcompanion.Services
             return SuccessResult(response, 200);
         }
 
-        private GetSummaryByCarIdResponse GenerateGetSummaryByCarId(IList<Expense> expenses)
+        public async Task<bool> UserHasCarAsync(Guid carId, Guid userId)
+        {
+            var car = await _carRepository.GetCarByIdAsync(carId);
+            var userCar = car.UserCars.FirstOrDefault(user => user.UserId == userId);
+            return userCar != null;
+        }
+
+        private static GetSummaryByCarIdResponse GenerateGetSummaryByCarId(IList<Expense> expenses)
         {
             var response = new GetSummaryByCarIdResponse {ExpensesCount = expenses.Count()};
 
@@ -44,6 +54,7 @@ namespace carcompanion.Services
 
                 var categorySummary =
                     response.CategoriesSummary.SingleOrDefault(c => c.CategoryName == expense.Category);
+
                 if (categorySummary == null)
                 {
                     var newCategorySummary = new CategorySummary

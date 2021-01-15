@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using carcompanion.Contract.V1.Requests.Summary;
+using carcompanion.Extensions;
 using carcompanion.Results;
 using carcompanion.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,7 @@ namespace carcompanion.Controllers.V1
         [HttpGet(Summary.GetSummaryForCar)]
         public async Task<IActionResult> GetSummary([FromRoute] Guid carId, [FromQuery] GetSummaryQueryRequest request)
         {
-            var result = await _summaryService.GetSummaryByCarIdAsync(carId, request.StartDate, request.EndDate);
+            var result = await _summaryService.GetSummaryByCarIdAsync(carId, HttpContext.GetUserId(), request.StartDate, request.EndDate);
             return GenerateResponse(result);
         }
 

@@ -6,6 +6,6 @@ namespace carcompanion.Services.Interfaces
 {
     public interface ISummaryService
     {
-        Task<ServiceResult> GetSummaryByCarIdAsync(Guid carId, DateTime startDate, DateTime endDate);
+        Task<ServiceResult> GetSummaryByCarIdAsync(Guid carId, Guid userId, DateTime startDate, DateTime endDate);
     }
 }

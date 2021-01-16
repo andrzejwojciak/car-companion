@@ -39,7 +39,7 @@ namespace carcompanion.Services
             if (await UserExistsByEmailAsync(email))
                 return AuthFailed("User already exists");
 
-            var user = new User {Email = email, Password = password};
+            var user = new User {Email = email, Password = password, RoleId = "user"};
 
             if (!await AddUserAsync(user))
                 return AuthFailed("Something went wrong");
@@ -72,7 +72,7 @@ namespace carcompanion.Services
             if (user != null)
                 return await _jwtManager.AuthenticateUserAsync(user);
 
-            var newUser = new User {Email = fbAuthResult.Email, EmailConfirmed = true};
+            var newUser = new User {Email = fbAuthResult.Email, EmailConfirmed = true, RoleId = "user"};
 
             if (!await AddUserAsync(newUser))
                 return AuthFailed("Something went wrong");

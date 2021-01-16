@@ -16,6 +16,7 @@ namespace carcompanion.Data
         public DbSet<RefreshToken> RefreshTokens { get; set; }
         public DbSet<ExpenseCategory> ExpenseCategories { get; set; }
         public DbSet<ShareKey> ShareKeys { get; set; }
+        public DbSet<Role> Roles { get; set; }
         public DbSet<UserCarRole> UserCarRoles { get; set; }
         
         
@@ -68,7 +69,12 @@ namespace carcompanion.Data
                 .HasOne(c => c.UserCarRole)
                 .WithMany(s => s.ShareKeys)
                 .HasForeignKey(c => c.UserCarRoleId);
-                        
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)
+                .WithMany(u => u.Users)
+                .HasForeignKey(k => k.RoleId);
+            
             modelBuilder.Seed();      
         }
         

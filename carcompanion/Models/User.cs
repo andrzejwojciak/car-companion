@@ -16,8 +16,11 @@ namespace carcompanion.Models
         public string Email { get; set; }
         public string Password { get; set; }
         public bool EmailConfirmed { get; set; }
+        public string RoleId { get; set; }
         public DateTime AddedDate { get; set; }
 
+
+        public Role Role { get; set; }
         public ICollection<Expense> Expenses { get; set; }
         public ICollection<ShareKey> ShareKeys { get; set; }
         public ICollection<UserCar> UserCars { get; set; }

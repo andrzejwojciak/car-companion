@@ -29,8 +29,12 @@ namespace carcompanion
                 var host = CreateHostBuilder(args).Build();
 
                 ApplyMigrations(host);
+
+                Log.Information("Application is ready to rock");
                 
                 host.Run();
+                
+                Log.Information("Application is shutting down");
             }
             catch (Exception e)
             {

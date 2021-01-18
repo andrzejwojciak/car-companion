@@ -49,6 +49,11 @@ namespace carcompanion
                 options.UseSqlServer(Configuration.GetConnectionString("Database")));
 
             services.AddControllers();
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireGetLogPrivilege", policy => 
+                    policy.RequireClaim("role", "admin", "superUser"));
+            });
 
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
             services.AddAuthentication(x =>
@@ -118,6 +123,7 @@ namespace carcompanion
             services.AddScoped<IFacebookAuthService, FacebookAuthService>();
             services.AddScoped<IJwtManager, JwtManager>();
             services.AddScoped<ISummaryService, SummaryService>();
+            services.AddScoped<ILogService, LogService>();
 
             services.AddTransient<IExpenseRepository, ExpenseRepository>();
             services.AddTransient<ICarRepository, CarRepository>();
@@ -125,6 +131,7 @@ namespace carcompanion
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IRefreshTokenRepository, RefreshTokenRepository>();
             services.AddTransient<IShareKeyRepository, ShareKeyRepository>();
+            services.AddTransient<ILogRepository, LogRepository>();
 
             services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
@@ -153,7 +160,6 @@ namespace carcompanion
             app.UseRouting();
 
             app.UseAuthentication();
-            app.UseAuthorization();
             
             app.Use(async (httpContext, next) =>  
             {  
@@ -167,6 +173,8 @@ namespace carcompanion
             });  
 
             app.UseSerilogRequestLogging();
+            
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

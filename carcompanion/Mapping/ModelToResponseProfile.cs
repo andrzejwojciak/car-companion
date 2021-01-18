@@ -3,6 +3,7 @@ using carcompanion.Contract.V1.Responses.Expense;
 using carcompanion.Contract.V1.Responses.Car;
 using carcompanion.Models;
 using System;
+using carcompanion.Contract.V1.Responses.Log;
 
 namespace carcompanion.Mapping
 {
@@ -21,14 +22,16 @@ namespace carcompanion.Mapping
 
             CreateMap<Car, GetExpensesByCarIdResponse>();
 
-            CreateMap<Car, CreateCarResponse>()
-                .ForMember(x => x.Mileage, opt => opt.MapFrom(src => src.Mileage == null ? null : src.Mileage));
+            CreateMap<Car, CreateCarResponse>();
 
             CreateMap<Car, GetCarByIdResponse>();
             CreateMap<Car, UpdateCarResponse>();
             CreateMap<UserCar, GetCarByIdResponse>();
 
             CreateMap<ExpenseCategory, ExpenseCategoryResponse>();
+
+            CreateMap<Log, UserLogResponse>();
+            CreateMap<Log, AdminLogResponse>();
         }
     }
 }

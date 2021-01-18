@@ -29,47 +29,47 @@ namespace carcompanion.Controllers.V1
         public async Task<ActionResult> Create(CreateCarRequest request)
         {
             var result = await _carService.CreateCarAsync(HttpContext.GetUserId(), _mapper.Map<Car>(request));
-            return GenreateResponse(result);
+            return GenerateResponse(result);
         }
 
         [HttpGet(Cars.GetUserCars)]
         public async Task<ActionResult> GetUserCars()
         {
             var result = await _carService.GetCarsByUserIdAsync(HttpContext.GetUserId());
-            return GenreateResponse(result);
+            return GenerateResponse(result);
         }
 
         [HttpGet(Cars.GetCarById)]
         public async Task<ActionResult> GetCar([FromRoute] Guid carId)
         {
             var result = await _carService.GetCarByIdAsync(HttpContext.GetUserId(), carId);
-            return GenreateResponse(result);
+            return GenerateResponse(result);
         }
 
         [HttpPut(Cars.PutCar)]
         public async Task<ActionResult> PutCar([FromRoute] Guid carId, [FromBody] PutCarRequest request)
         {
             var result = await _carService.UpdateCarByIdAsync(HttpContext.GetUserId(), carId, request);
-            return GenreateResponse(result);
+            return GenerateResponse(result);
         }
 
         [HttpPatch(Cars.PatchCar)]
         public async Task<ActionResult> PatchCar([FromRoute] Guid carId, [FromBody] PatchCarRequest request)
         {
             var result = await _carService.UpdateCarByIdAsync(HttpContext.GetUserId(), carId, request);
-            return GenreateResponse(result);
+            return GenerateResponse(result);
         }
 
         [HttpDelete(Cars.DeleteCar)]
         public async Task<IActionResult> DeleteCar([FromRoute] Guid carId)
         {
             var result = await _carService.DeleteCarByIdAsync(HttpContext.GetUserId(), carId);
-            return GenreateResponse(result);
+            return GenerateResponse(result);
         }
 
-        private ActionResult GenreateResponse(ServiceResult result) =>
-            !result.Success
-                ? StatusCode(result.Status, result.ErrorMessage)
-                : StatusCode(result.Status, result.ResponseData);
+        private ActionResult GenerateResponse(ServiceResult result) =>
+            result.Success
+                ? StatusCode(result.Status, result.ResponseData)
+                : StatusCode(result.Status, result.ErrorMessage);
     }
 }

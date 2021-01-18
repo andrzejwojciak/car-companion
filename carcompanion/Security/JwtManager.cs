@@ -36,7 +36,7 @@ namespace carcompanion.Security
             var authResult = new AuthenticationResult
             {
                 Success = true,
-                AccessToken = GenerateAccessToken(newAccessTokenJti, user.UserId, user.Email),
+                AccessToken = GenerateAccessToken(newAccessTokenJti, user.UserId, user.Email, user.RoleId),
                 RefreshToken = await GenerateRefreshToken(newAccessTokenJti, user.UserId)
             };
                 
@@ -48,7 +48,7 @@ namespace carcompanion.Security
             var validatedAccessToken = GetValidatedAccessToken(accessToken);
             
             if(validatedAccessToken == null)
-                return new AuthenticationResult { Success = false, ErrorMessage = "Token is not valid" };
+                return new AuthenticationResult { Success = false, ErrorMessage = "Access token is not valid" };
 
             if(validatedAccessToken.ValidTo > DateTime.UtcNow)
                 return new AuthenticationResult { Success = false, ErrorMessage = "Access token hadn't expired yet" };
@@ -60,18 +60,19 @@ namespace carcompanion.Security
                 return result;
                 
             var newAccessTokenJti = Guid.NewGuid();
-            GetFromClaims(validatedAccessToken.Claims, out var email, out var userId);
+            GetFromClaims(validatedAccessToken.Claims, out var email, out var userId, out var role);
 
-            result.AccessToken = GenerateAccessToken(newAccessTokenJti, userId, email);
+            result.AccessToken = GenerateAccessToken(newAccessTokenJti, userId, email, role);
             result.RefreshToken = await GenerateRefreshToken(newAccessTokenJti, userId);
             
             return result;
         }
 
-        private void GetFromClaims(IEnumerable<Claim> tokenClaims, out string email, out Guid userId)
+        private void GetFromClaims(IEnumerable<Claim> tokenClaims, out string email, out Guid userId, out string userRole)
         {
             email = tokenClaims.First(x => x.Type.Equals("email")).Value;
             userId = Guid.Parse(tokenClaims.First(x => x.Type.Equals("sub")).Value);
+            userRole = tokenClaims.First(x => x.Type.Equals("role")).Value;
         }
 
         private JwtSecurityToken GetValidatedAccessToken(string accessToken)
@@ -104,7 +105,7 @@ namespace carcompanion.Security
             }
         }
 
-        private string GenerateAccessToken(Guid accessTokenJti, Guid userId, string userEmail)
+        private string GenerateAccessToken(Guid accessTokenJti, Guid userId, string userEmail, string userRole)
         {
             var key = Encoding.ASCII.GetBytes(_jwtSettings.SigningKey);   
             var tokenHandler = new JwtSecurityTokenHandler();
@@ -115,7 +116,8 @@ namespace carcompanion.Security
                 { 
                     new Claim(JwtRegisteredClaimNames.Sub, userId.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, accessTokenJti.ToString()),
-                    new Claim(JwtRegisteredClaimNames.Email, userEmail)
+                    new Claim(JwtRegisteredClaimNames.Email, userEmail),
+                    new Claim("role", userRole)
                 }),
 
                 Expires = DateTime.UtcNow.Add(TimeSpan.Parse(_jwtSettings.AccessTokenLifeTime)),

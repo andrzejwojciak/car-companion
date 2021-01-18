@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Text;
 using AutoMapper;
 using carcompanion.Data;
@@ -18,6 +19,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
+using Serilog.Context;
 
 namespace carcompanion
 {
@@ -143,7 +146,6 @@ namespace carcompanion
                 c.RoutePrefix = string.Empty;
             });
 
-
             app.UseCors();
 
             app.UseHttpsRedirection();
@@ -152,6 +154,19 @@ namespace carcompanion
 
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            app.Use(async (httpContext, next) =>  
+            {  
+                var ip = httpContext.Connection.RemoteIpAddress.ToString();  
+                LogContext.PushProperty("ClientIp", !string.IsNullOrWhiteSpace(ip) ? ip : "unknown");  
+            
+                var userId = httpContext.User.Claims.FirstOrDefault(claim => claim.Type.Equals("sub"))?.Value;  
+                LogContext.PushProperty("UserId", !string.IsNullOrWhiteSpace(userId) ? userId : "anonymous");  
+                  
+                await next.Invoke();  
+            });  
+
+            app.UseSerilogRequestLogging();
 
             app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
         }

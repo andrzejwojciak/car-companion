@@ -1,15 +1,12 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using carcompanion.Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace carcompanion
 {
@@ -17,10 +14,40 @@ namespace carcompanion
     {
         public static void Main(string[] args)
         {
-            var host = CreateHostBuilder(args).Build();
+            var configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build();
 
+            Log.Logger = new LoggerConfiguration()
+                .ReadFrom.Configuration(configuration)
+                .CreateLogger();
+            
+            try
+            {
+                Log.Information("Application starting up");
+                
+                var host = CreateHostBuilder(args).Build();
+
+                ApplyMigrations(host);
+                
+                host.Run();
+            }
+            catch (Exception e)
+            {
+                Log.Fatal(e, "The application failed to start");
+            }
+            finally
+            {
+                Log.CloseAndFlush();
+            }
+            
+        }
+
+        private static void ApplyMigrations(IHost host)
+        {
+            Log.Information("Trying to apply migrations into database");
+            
             bool dbReadyToGo;
-
             do
             {
                 try
@@ -34,18 +61,20 @@ namespace carcompanion
                 }
                 catch (Exception)
                 {
-                    Console.WriteLine("Something went wrong while applying migrations, trying again");
                     dbReadyToGo = false;
-                    Thread.Sleep(4000);
+                    Log.Warning("Something went wrong while applying migrations");
+                    Thread.Sleep(6000);
+                    Log.Information("Trying again");
                 }
-
+                
             } while (dbReadyToGo == false);
 
-            host.Run();
+            Log.Information("Migrations applied successfully");
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args) =>
             Host.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();

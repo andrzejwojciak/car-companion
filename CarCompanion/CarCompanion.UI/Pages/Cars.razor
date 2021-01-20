@@ -1,0 +1,58 @@
+@page "/cars"
+@using CarCompanion.Shared.Contract.V1.Responses.Car
+@inject HttpClient Http
+
+<h3>
+    Your cars:
+</h3>
+
+@if (getUserCarsResponse == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <td>MainName</td>
+                <td>Brand</td>
+                <td>Model</td>
+                <td>Generation</td>
+                <td>Plate</td>
+                <td>Mileage</td>
+                <td>ProductionYear</td>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var car in getUserCarsResponse.Cars)
+            {
+                <tr>
+                    <td>@car.MainName</td>
+                    <td>@car.Brand</td>
+                    <td>@car.Model</td>
+                    <td>@car.Generation</td>
+                    <td>@car.Plate</td>
+                    <td>@car.Mileage</td>
+                    <td>@car.ProductionYear</td>
+                    <td>
+                        <a href="cars/@car.CarId" >
+                            More info
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table> 
+}
+
+@code {
+    private GetUserCarsResponse getUserCarsResponse;
+
+    protected override async Task OnInitializedAsync()
+    {       
+        Http.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NTcxMmY3ZS0wYWU3LTQ3ODQtMTE5NC0wOGQ4YmQyYTFjZjQiLCJqdGkiOiI5YmQ5NGEwZi1kMDgwLTQzOTEtOWQxZS1iZDViYWI3NTBkODgiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsIm5iZiI6MTYxMTE2NTg2OSwiZXhwIjoxNjExMTY5NDY5LCJpYXQiOjE2MTExNjU4NjksImlzcyI6ImNhcmNvbXBhbmlvbi1iYWNrZW5kIn0.0jpVFui-uuYgikPSds0HfIpQJPAiYiItyDNKvKQNKY4");        
+
+        getUserCarsResponse = await Http.GetFromJsonAsync<GetUserCarsResponse>("http://localhost:8080/api/v1/cars");
+    }
+}

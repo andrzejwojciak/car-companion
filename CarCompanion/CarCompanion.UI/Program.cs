@@ -1,6 +1,9 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Blazorise;
+using Blazorise.Bootstrap;
+using Blazorise.Icons.FontAwesome;
 using CarCompanion.UI.Services;
 using CarCompanion.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -14,14 +17,28 @@ namespace CarCompanion.UI
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
-
+            
+            builder.Services
+                  .AddBlazorise( options =>
+                  {
+                      options.ChangeTextOnKeyPress = true;
+                  } )
+                  .AddBootstrapProviders()
+                  .AddFontAwesomeIcons();
+            
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<ICarService, CarService>();
             builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
+            
+            var host = builder.Build();
 
-            await builder.Build().RunAsync();
+            host.Services
+                .UseBootstrapProviders()
+                .UseFontAwesomeIcons();
+
+            await host.RunAsync();
             
             
         }

@@ -7,44 +7,75 @@
 
 @inject HttpClient HttpClient
 @inject IAuthService AuthService
-@inject NavigationManager NavigationManager 
+@inject NavigationManager NavigationManager
+
+@* <div> *@
+@*     <EditForm Model="@loginRequest" OnValidSubmit="@SendLoginRequest"> *@
+@*         <DataAnnotationsValidator /> *@
+@*                  *@
+@*         <div> *@
+@*             <label>Login</label> *@
+@*             <InputText @bind-Value="loginRequest.Email"/> *@
+@*             <ValidationMessage For="@(() => loginRequest.Email)" /> *@
+@*         </div> *@
+@*          *@
+@*         <div> *@
+@*             <label>Password</label> *@
+@*             <InputText type="password" @bind-Value="loginRequest.Password" /> *@
+@*             <ValidationMessage For="@(() => loginRequest.Password)" /> *@
+@*         </div> *@
+@* *@
+@*         <button type="submit">Login</button> *@
+@*         $1$ @if (!string.IsNullOrEmpty(errorMessage)) #1# *@
+@*         $1$ { #1# *@
+@*         $1$     <p style="color: #ff0000;">@errorMessage</p> #1# *@
+@*         $1$ } #1# *@
+@*         $1$ #1# *@
+@*     </EditForm> *@
+@* </div> *@
 
 <div>
-    <EditForm Model="@loginRequest" OnValidSubmit="@SendLoginRequest">
-        <DataAnnotationsValidator />
-                
-        <div>
-            <label>Login</label>
-            <InputText @bind-Value="loginRequest.Email"/>
-            <ValidationMessage For="@(() => loginRequest.Email)" />
-        </div>
-        
-        <div>
-            <label>Password</label>
-            <InputText type="password" @bind-Value="loginRequest.Password" />
-            <ValidationMessage For="@(() => loginRequest.Password)" />
-        </div>
+    <Validations Mode="ValidationMode.Auto" Model="@loginRequest">
+        <Validation>
+            <Field>
+                <FieldLabel>Email address</FieldLabel>
+                <TextEdit Placeholder="Enter email" @bind-Text="@loginRequest.Email">
+                    <FieldHelp>Please enter a valid email address</FieldHelp>
+                </TextEdit>
+            </Field>
+        </Validation>
+        <Validation>
+            <Field>
+                <FieldLabel>Password</FieldLabel>
+                <TextEdit type="password" Placeholder="Enter email" @bind-Text="@loginRequest.Password">
+                    <FieldHelp>Please enter a valid password</FieldHelp>
+                </TextEdit>
+            </Field>
+        </Validation>
+        <Validation>
+            <Button Color="Color.Primary" Clicked="@SendLoginRequest">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Login
+            </Button>
+        </Validation>
+    </Validations>
 
-        <button type="submit">Login</button>
-        @if (!string.IsNullOrEmpty(errorMessage))
-        {
-            <p style="color: #ff0000;">@errorMessage</p>
-        }
-        
-    </EditForm>
+    @if (!string.IsNullOrEmpty(errorMessage))
+    {
+        <p style="color: #ff0000;">@errorMessage</p>
+    }
+
 </div>
 
-@if(loginResponse != null)
-{
-    <div>
-        @loginResponse.AccessToken
-    </div>
-}
 
 @code {
     private string errorMessage;
     private AuthSuccessResponse loginResponse;
     private LoginRequest loginRequest = new LoginRequest();
+    private bool loading;
 
     protected override async void OnInitialized()
     {
@@ -53,17 +84,20 @@
             NavigationManager.NavigateTo("");
         }
     }
-    
+
     private async void SendLoginRequest()
     {
+        loading = true;
         loginResponse = await AuthService.LoginAsync(loginRequest.Email, loginRequest.Password);
-        
+
         if (loginResponse.Success)
         {
             NavigationManager.NavigateTo("/");
         }
-        
+
         errorMessage = "Wrong login or password";
+        loading = false;
         StateHasChanged();
     }
+
 }

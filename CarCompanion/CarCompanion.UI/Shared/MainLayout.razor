@@ -1,13 +1,17 @@
+@using CarCompanion.UI.Services.Interfaces
 @inherits LayoutComponentBase
+
+@inject IAuthService AuthService
+@inject ILocalStorageService LocalStorageService
 
 <div class="page">
     <div class="sidebar">
-        <NavMenu />
+        <NavMenu/>
     </div>
 
     <div class="main">
         <div class="top-row px-4">
-            <a href="http://blazor.net" target="_blank" class="ml-md-auto">About</a>
+            <a href="logout">Logout</a>
         </div>
 
         <div class="content px-4">

@@ -1,0 +1,17 @@
+﻿@page "/logout"
+
+@using CarCompanion.UI.Services.Interfaces
+
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+@code
+{
+    protected override async void OnInitialized()
+    {
+        if (await AuthService.IsAuthorizedAsync())
+            await AuthService.LogoutAsync();
+
+        NavigationManager.NavigateTo("/login");
+    }
+}

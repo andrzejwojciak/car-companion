@@ -1,40 +1,44 @@
 @page "/cars"
 @using CarCompanion.Shared.Contract.V1.Responses.Car
+@using CarCompanion.UI.Services.Interfaces
+
 @inject HttpClient Http
+@inject IAuthService AuthService
+@inject ICarService CarService
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
+
 
 <h3>
     Your cars:
 </h3>
 
-@if (getUserCarsResponse == null)
+@if (_response == null)
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
-        <thead>
+    @if (_response.IsSuccessStatusCode)
+    {
+        <table class="table">
+            <thead>
             <tr>
                 <td>MainName</td>
                 <td>Brand</td>
                 <td>Model</td>
                 <td>Generation</td>
-                <td>Plate</td>
-                <td>Mileage</td>
-                <td>ProductionYear</td>
+                <td></td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var car in getUserCarsResponse.Cars)
+            </thead>
+            <tbody>
+            @foreach (var car in _getUserCarsResponse.Cars)
             {
                 <tr>
                     <td>@car.MainName</td>
                     <td>@car.Brand</td>
                     <td>@car.Model</td>
                     <td>@car.Generation</td>
-                    <td>@car.Plate</td>
-                    <td>@car.Mileage</td>
-                    <td>@car.ProductionYear</td>
                     <td>
                         <a href="cars/@car.CarId" >
                             More info
@@ -42,17 +46,46 @@ else
                     </td>
                 </tr>
             }
-        </tbody>
-    </table> 
+            </tbody>
+        </table> 
+    }
+    else
+    {
+        <p><em>You might not have access to this resources</em></p>
+    }
 }
 
 @code {
-    private GetUserCarsResponse getUserCarsResponse;
+    
+    private GetUserCarsResponse _getUserCarsResponse;
+    private HttpResponseMessage _response;
+    private const string Url = "http://localhost:8080/api/v1/cars";
 
     protected override async Task OnInitializedAsync()
-    {       
-        Http.DefaultRequestHeaders.Add("Authorization", "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3NTcxMmY3ZS0wYWU3LTQ3ODQtMTE5NC0wOGQ4YmQyYTFjZjQiLCJqdGkiOiI5YmQ5NGEwZi1kMDgwLTQzOTEtOWQxZS1iZDViYWI3NTBkODgiLCJlbWFpbCI6InVzZXJAZXhhbXBsZS5jb20iLCJyb2xlIjoidXNlciIsIm5iZiI6MTYxMTE2NTg2OSwiZXhwIjoxNjExMTY5NDY5LCJpYXQiOjE2MTExNjU4NjksImlzcyI6ImNhcmNvbXBhbmlvbi1iYWNrZW5kIn0.0jpVFui-uuYgikPSds0HfIpQJPAiYiItyDNKvKQNKY4");        
+    {
+        if (!await AuthService.IsAuthorizedAsync())
+        {
+            NavigationManager.NavigateTo("Login");
+        }
 
-        getUserCarsResponse = await Http.GetFromJsonAsync<GetUserCarsResponse>("http://localhost:8080/api/v1/cars");
+        var accessToken = await LocalStorageService.GetItem<string>("accessToken");
+        
+        var httpRequestMessage = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri(Url),
+            Headers =
+            {
+                {"Authorization", $"Bearer {accessToken}"},
+                {"Accept", "application/json"}
+            }
+        };
+        
+        _response = await Http.SendAsync(httpRequestMessage);
+        
+        if (_response.IsSuccessStatusCode)
+        {
+            _getUserCarsResponse = await _response.Content.ReadFromJsonAsync<GetUserCarsResponse>();
+        }
     }
 }

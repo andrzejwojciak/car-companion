@@ -1,0 +1,69 @@
+@layout LoginLayout
+@page "/login"
+
+@using CarCompanion.Shared.Contract.Security.Requests
+@using CarCompanion.Shared.Contract.Security.Responses
+@using CarCompanion.UI.Services.Interfaces
+
+@inject HttpClient HttpClient
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager 
+
+<div>
+    <EditForm Model="@loginRequest" OnValidSubmit="@SendLoginRequest">
+        <DataAnnotationsValidator />
+                
+        <div>
+            <label>Login</label>
+            <InputText @bind-Value="loginRequest.Email"/>
+            <ValidationMessage For="@(() => loginRequest.Email)" />
+        </div>
+        
+        <div>
+            <label>Password</label>
+            <InputText type="password" @bind-Value="loginRequest.Password" />
+            <ValidationMessage For="@(() => loginRequest.Password)" />
+        </div>
+
+        <button type="submit">Login</button>
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <p style="color: #ff0000;">@errorMessage</p>
+        }
+        
+    </EditForm>
+</div>
+
+@if(loginResponse != null)
+{
+    <div>
+        @loginResponse.AccessToken
+    </div>
+}
+
+@code {
+    private string errorMessage;
+    private AuthSuccessResponse loginResponse;
+    private LoginRequest loginRequest = new LoginRequest();
+
+    protected override async void OnInitialized()
+    {
+        if (await AuthService.IsAuthorizedAsync())
+        {
+            NavigationManager.NavigateTo("");
+        }
+    }
+    
+    private async void SendLoginRequest()
+    {
+        loginResponse = await AuthService.LoginAsync(loginRequest.Email, loginRequest.Password);
+        
+        if (loginResponse.Success)
+        {
+            NavigationManager.NavigateTo("/");
+        }
+        
+        errorMessage = "Wrong login or password";
+        StateHasChanged();
+    }
+}

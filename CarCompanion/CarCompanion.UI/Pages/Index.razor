@@ -1,5 +1,28 @@
 ﻿@page "/"
 
-<h1>Welcome on Car Companion!</h1>
+@using CarCompanion.UI.Services.Interfaces
 
-You can add cars and menage expenses!
+@inject HttpClient Http
+@inject IAuthService AuthService
+@inject ICarService CarService
+@inject NavigationManager NavigationManager
+@inject ILocalStorageService LocalStorageService
+
+
+
+<h1>Newsletter</h1>
+
+there will be newsletter from car world
+
+@code
+{
+    protected override async Task OnInitializedAsync()
+    {
+        if (!await AuthService.IsAuthorizedAsync())
+        {
+            NavigationManager.NavigateTo("Login");
+        }
+    
+    }
+
+}

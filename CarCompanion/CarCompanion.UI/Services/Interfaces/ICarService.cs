@@ -5,6 +5,6 @@ namespace CarCompanion.UI.Services.Interfaces
 {
     public interface ICarService
     {
-        Task<GetUserCarsResponse> GetUserCars();
+        Task<GetUserCarsResponse> GetUserCarsAsync();
     }
 }

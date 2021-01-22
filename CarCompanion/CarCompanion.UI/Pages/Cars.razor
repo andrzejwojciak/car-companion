@@ -13,14 +13,14 @@
     Your cars:
 </h3>
 
-@if (_response == null)
+@if (_getUserCarsResponse == null)
 {
-    <p><em>Loading...</em></p>
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
 }
 else
 {
-    @if (_response.IsSuccessStatusCode)
-    {
         <table class="table">
             <thead>
             <tr>
@@ -48,17 +48,11 @@ else
             }
             </tbody>
         </table> 
-    }
-    else
-    {
-        <p><em>You might not have access to this resources</em></p>
-    }
 }
 
 @code {
     
     private GetUserCarsResponse _getUserCarsResponse;
-    private HttpResponseMessage _response;
     private const string Url = "http://localhost:8080/api/v1/cars";
 
     protected override async Task OnInitializedAsync()
@@ -68,24 +62,6 @@ else
             NavigationManager.NavigateTo("Login");
         }
 
-        var accessToken = await LocalStorageService.GetItem<string>("accessToken");
-        
-        var httpRequestMessage = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(Url),
-            Headers =
-            {
-                {"Authorization", $"Bearer {accessToken}"},
-                {"Accept", "application/json"}
-            }
-        };
-        
-        _response = await Http.SendAsync(httpRequestMessage);
-        
-        if (_response.IsSuccessStatusCode)
-        {
-            _getUserCarsResponse = await _response.Content.ReadFromJsonAsync<GetUserCarsResponse>();
-        }
+        _getUserCarsResponse = await CarService.GetUserCarsAsync();        
     }
 }

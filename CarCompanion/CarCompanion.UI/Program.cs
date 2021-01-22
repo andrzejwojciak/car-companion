@@ -29,6 +29,7 @@ namespace CarCompanion.UI
             builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
             
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IRequestSenderService, RequestSenderService>();
             builder.Services.AddScoped<ICarService, CarService>();
             builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
             

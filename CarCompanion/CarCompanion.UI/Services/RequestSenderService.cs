@@ -7,6 +7,7 @@ using CarCompanion.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using System.Net;
 using System;
+using CarCompanion.Shared.Results;
 
 namespace CarCompanion.UI.Services
 {
@@ -16,11 +17,70 @@ namespace CarCompanion.UI.Services
         private readonly NavigationManager _navigationManager;
         private readonly ILocalStorageService _localStorageService;
 
-        public RequestSenderService(HttpClient httpClient, NavigationManager navigationManager, ILocalStorageService localStorageService)
+        public RequestSenderService(HttpClient httpClient, NavigationManager navigationManager,
+            ILocalStorageService localStorageService)
         {
             _localStorageService = localStorageService;
             _navigationManager = navigationManager;
             _httpClient = httpClient;
+        }
+
+        public async Task<ServiceResult<T>> SendAuthPostRequestAsync<T>(string uri, object value)
+        {
+            var accessToken = await _localStorageService.GetItem<string>("accessToken");
+
+            var jsonContent = JsonSerializer.Serialize(value);
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(uri),
+                Headers =
+                {
+                    {"Authorization", $"Bearer {accessToken}"},
+                    {"Accept", "application/json"}
+                },
+                Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
+            };
+
+            var response = await _httpClient.SendAsync(httpRequestMessage);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _navigationManager.NavigateTo("logout");
+                return default;
+            }
+            
+            var result = new ServiceResult<T> {Success = true, Data = await response.Content.ReadFromJsonAsync<T>()};
+            return result;
+        }
+
+        public async Task<ServiceResult<T>> SendAuthGetRequestAsync<T>(string uri)
+        {
+            var accessToken = await _localStorageService.GetItem<string>("accessToken");
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(uri),
+                Headers =
+                {
+                    {"Authorization", $"Bearer {accessToken}"},
+                    {"Accept", "application/json"}
+                }
+            };
+
+            var response = await _httpClient.SendAsync(httpRequestMessage);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                _navigationManager.NavigateTo("logout");
+                return default;
+            }
+
+            var data = await response.Content.ReadFromJsonAsync<T>();
+            var result = new ServiceResult<T> {Success = true, Data = data};
+            return result;
         }
 
         public async Task<T> AuthenticateGetRequestAsync<T>(string uri)
@@ -37,9 +97,9 @@ namespace CarCompanion.UI.Services
                     {"Accept", "application/json"}
                 }
             };
-            
+
             var response = await _httpClient.SendAsync(httpRequestMessage);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 _navigationManager.NavigateTo("logout");
@@ -52,7 +112,7 @@ namespace CarCompanion.UI.Services
         public async Task<T> AuthenticatePostRequestAsync<T>(string uri, object value)
         {
             var accessToken = await _localStorageService.GetItem<string>("accessToken");
-            
+
             var jsonContent = JsonSerializer.Serialize(value);
 
             var httpRequestMessage = new HttpRequestMessage
@@ -61,15 +121,14 @@ namespace CarCompanion.UI.Services
                 RequestUri = new Uri(uri),
                 Headers =
                 {
-
                     {"Authorization", $"Bearer {accessToken}"},
                     {"Accept", "application/json"}
                 },
                 Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
             };
-            
+
             var response = await _httpClient.SendAsync(httpRequestMessage);
-            
+
             if (!response.IsSuccessStatusCode)
             {
                 _navigationManager.NavigateTo("logout");

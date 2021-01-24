@@ -1,8 +1,6 @@
-﻿using System;
-using System.Net.Http;
-using System.Net.Http.Json;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CarCompanion.Shared.Contract.V1.Responses.Car;
+using CarCompanion.Shared.Results;
 using CarCompanion.UI.Services.Interfaces;
 
 namespace CarCompanion.UI.Services
@@ -12,15 +10,20 @@ namespace CarCompanion.UI.Services
         private const string Url = "http://localhost:8080/api/v1/cars";
         private readonly IRequestSenderService _requestSenderService;
 
-        public CarService(IRequestSenderService reqestSenderService)
+        public CarService(IRequestSenderService requestSenderService)
         {
-            _requestSenderService =  reqestSenderService;
+            _requestSenderService =  requestSenderService;
         }
 
-        public async Task<GetUserCarsResponse> GetUserCarsAsync()
+        public async Task<ServiceResult<GetUserCarsResponse>> GetUserCarsAsync()
         {
-            return await _requestSenderService.AuthenticateGetRequestAsync<GetUserCarsResponse>(Url);
+            return await _requestSenderService.SendAuthGetRequestAsync<GetUserCarsResponse>(Url);
         }
-        
+
+        public async Task<ServiceResult<GetCarByIdResponse>> GetCarByIdAsync(string carId)
+        {
+            return await _requestSenderService.SendAuthGetRequestAsync<GetCarByIdResponse>(Url + "/" + carId);
+        }
+
     }
 }

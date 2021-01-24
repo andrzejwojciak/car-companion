@@ -1,23 +1,25 @@
 @page "/cars/{CarId}"
 @using CarCompanion.Shared.Contract.V1.Responses.Car
+@using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
 
-@inject HttpClient Http
-@inject IAuthService AuthService
 @inject NavigationManager NavigationManager
-@inject ILocalStorageService LocalStorageService
+@inject IAuthService AuthService
+@inject ICarService CarService
 
 <h3>
     Your car info:
 </h3>
 
-@if (_response == null)
+@if (result == null)
 {
-    <p><em>Loading...</em></p>
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
 }
 else
 {
-    @if (_response.IsSuccessStatusCode)
+    @if (result.Success)
     {
         <table class="table">
              <thead>
@@ -33,13 +35,13 @@ else
              </thead>
              <tbody>
              <tr>
-                 <td>@_getCarByIdResponse.MainName</td>
-                 <td>@_getCarByIdResponse.Brand</td>
-                 <td>@_getCarByIdResponse.Model</td>
-                 <td>@_getCarByIdResponse.Generation</td>
-                 <td>@_getCarByIdResponse.Plate</td>
-                 <td>@_getCarByIdResponse.Mileage</td>
-                 <td>@_getCarByIdResponse.ProductionYear</td>
+                 <td>@result.Data.MainName</td>
+                 <td>@result.Data.Brand</td>
+                 <td>@result.Data.Model</td>
+                 <td>@result.Data.Generation</td>
+                 <td>@result.Data.Plate</td>
+                 <td>@result.Data.Mileage</td>
+                 <td>@result.Data.ProductionYear</td>
              </tr>
              </tbody>
         </table>
@@ -56,9 +58,7 @@ else
     [Parameter]
     public string CarId { get; set; }
 
-    private HttpResponseMessage _response;
-    private GetCarByIdResponse _getCarByIdResponse;
-
+    private ServiceResult<GetCarByIdResponse> result;
 
     protected override async Task OnInitializedAsync()
     {
@@ -66,28 +66,8 @@ else
         {
             NavigationManager.NavigateTo("Login");
         }
-        
-        var url = "http://localhost:8080/api/v1/cars/" + CarId;
-        
-        var accessToken = await LocalStorageService.GetItem<string>("accessToken");
 
-        var httpRequestMessage = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(url),
-            Headers =
-            {
-                {"Authorization", $"Bearer {accessToken}"},
-                {"Accept", "application/json"}
-            }
-        };
-
-        _response = await Http.SendAsync(httpRequestMessage);
-
-        if (_response.IsSuccessStatusCode)
-        {
-            _getCarByIdResponse = await _response.Content.ReadFromJsonAsync<GetCarByIdResponse>();
-        }
+        result = await CarService.GetCarByIdAsync(CarId);
     }
 
 }

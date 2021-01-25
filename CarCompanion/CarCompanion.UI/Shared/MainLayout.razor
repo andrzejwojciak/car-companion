@@ -1,17 +1,22 @@
 @inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar" >
+<div class="d-flex vh-100">
+
+    <div>
         <NavMenu/>
     </div>
 
-    <div class="main">
-        <div class="top-row px-4">
-            <a href="logout">Logout</a>
+    <div class="flex-fill">
+        
+        <div class="d-flex flex-row-reverse border-bottom" style="height: 58px">
+            <a href="logout" class="btn btn-outline-primary rounded m-auto mr-1">Logout</a>
         </div>
 
-        <div class="content px-4">
+        <div class="m-2">
             @Body
         </div>
+        
     </div>
+
 </div>
+

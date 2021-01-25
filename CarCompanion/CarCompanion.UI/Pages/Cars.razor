@@ -10,7 +10,7 @@
 @inject ILocalStorageService LocalStorageService
 
 
-<h3>
+<h3 class="w-100 p-2" style="text-align: center;">
     Your cars:
 </h3>
 
@@ -23,34 +23,24 @@
 else
 {
     @if (result.Success)
-    { 
-        <table class="table">
-            <thead>
-            <tr>
-                <td>MainName</td>
-                <td>Brand</td>
-                <td>Model</td>
-                <td>Generation</td>
-                <td></td>
-            </tr>
-            </thead>
-            <tbody>
+    {
+        <div class="d-flex flex-wrap flex-row justify-content-center">
+            
             @foreach (var car in result.Data.Cars)
             {
-                <tr>
-                    <td>@car.MainName</td>
-                    <td>@car.Brand</td>
-                    <td>@car.Model</td>
-                    <td>@car.Generation</td>
-                    <td>
-                        <a href="cars/@car.CarId" >
-                            More info
-                        </a>
-                    </td>
-                </tr>
+                <div class="card p-1 m-2" style="width: 18rem;">
+                    <img class="card-img-top" src="https://bi.im-g.pl/im/60/c8/17/z24937568Q,Opel-Corsa-2020.jpg" alt="Card image cap">
+                    <div class="card-body">
+                        <h5 class="card-title">@car.MainName</h5>
+                        
+                        <p class="card-text">@car.Brand @car.Brand @car.Generation</p>
+                        
+                        <a href="cars/@car.CarId" class="btn btn-primary">More info</a>
+                    </div>
+                </div>
             }
-            </tbody>
-        </table>
+
+        </div>
     }
     else
     {
@@ -59,7 +49,7 @@ else
 }
 
 @code {
-    
+
     private ServiceResult<GetUserCarsResponse> result;
 
     protected override async Task OnInitializedAsync()
@@ -69,6 +59,7 @@ else
             NavigationManager.NavigateTo("Login");
         }
 
-        result = await CarService.GetUserCarsAsync();        
+        result = await CarService.GetUserCarsAsync();
     }
+
 }

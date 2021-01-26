@@ -10,7 +10,7 @@
 @inject ILocalStorageService LocalStorageService
 
 
-<h3 class="w-100 p-2" style="text-align: center;">
+<h3 class="w-100 m-2" style="text-align: center;">
     Your cars:
 </h3>
 
@@ -25,20 +25,40 @@ else
     @if (result.Success)
     {
         <div class="d-flex flex-wrap flex-row justify-content-center">
-            
-            @foreach (var car in result.Data.Cars)
-            {
-                <div class="card p-1 m-2" style="width: 18rem;">
-                    <img class="card-img-top" src="https://bi.im-g.pl/im/60/c8/17/z24937568Q,Opel-Corsa-2020.jpg" alt="Card image cap">
-                    <div class="card-body">
-                        <h5 class="card-title">@car.MainName</h5>
-                        
-                        <p class="card-text">@car.Brand @car.Brand @car.Generation</p>
-                        
-                        <a href="cars/@car.CarId" class="btn btn-primary">More info</a>
-                    </div>
-                </div>
-            }
+
+            <CardDeck>
+
+                @foreach (var car in result.Data.Cars)
+                {
+                    <Card Style="width: 18rem">
+                        <CardImage Source="https://bi.im-g.pl/im/60/c8/17/z24937568Q,Opel-Corsa-2020.jpg" Alt="Car image">
+                        </CardImage>
+                        <CardBody>
+                            <CardTitle Size="5">@car.MainName</CardTitle>
+                            <CardText>
+                                @car.Brand @car.Brand @car.Generation
+                            </CardText>
+                            <a class="btn btn-primary" href="cars/@car.CarId" role="button">More info</a>
+                        </CardBody>
+                    </Card>
+                }
+
+                <Card Style="width: 18rem; padding: 0">
+                    <CardBody Style="padding: 0;">
+                        <a class="btn btn-outline-dark w-100 h-100 d-flex justify-content-center align-items-center" href="add-car" style="background: rgb(159,203,213); background: linear-gradient(180deg, rgba(159,203,213,1) 0%, rgba(209,189,120,1) 100%);">
+                            <div class="d-flex flex-column">
+                                <h3>
+                                    <i class="fas fa-plus"></i>
+                                </h3>
+                                <h4>
+                                    Add new car
+                                </h4>
+                            </div>
+                        </a>
+                    </CardBody>
+                </Card>
+
+            </CardDeck>
 
         </div>
     }

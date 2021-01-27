@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CarCompanion.Shared.Contract.V1.Requests.Car;
 using CarCompanion.Shared.Contract.V1.Responses.Car;
 using CarCompanion.Shared.Results;
 using CarCompanion.UI.Services.Interfaces;
@@ -23,6 +24,11 @@ namespace CarCompanion.UI.Services
         public async Task<ServiceResult<GetCarByIdResponse>> GetCarByIdAsync(string carId)
         {
             return await _requestSenderService.SendAuthGetRequestAsync<GetCarByIdResponse>(Url + "/" + carId);
+        }
+
+        public async Task<ServiceResult<CreateCarResponse>> CreateCarAsync(CreateCarRequest request)
+        {
+            return await _requestSenderService.SendAuthPostRequestAsync<CreateCarResponse>(Url, request);
         }
 
     }

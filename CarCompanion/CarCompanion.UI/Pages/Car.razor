@@ -2,14 +2,11 @@
 @using CarCompanion.Shared.Contract.V1.Responses.Car
 @using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
+@using CarCompanion.UI.Components
 
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
 @inject ICarService CarService
-
-<h3>
-    Your car info:
-</h3>
 
 @if (result == null)
 {
@@ -21,37 +18,62 @@ else
 {
     @if (result.Success)
     {
-        <table class="table">
-             <thead>
-             <tr>
-                 <td>MainName</td>
-                 <td>Brand</td>
-                 <td>Model</td>
-                 <td>Generation</td>
-                 <td>Plate</td>
-                 <td>Mileage</td>
-                 <td>ProductionYear</td>
-             </tr>
-             </thead>
-             <tbody>
-             <tr>
-                 <td>@result.Data.MainName</td>
-                 <td>@result.Data.Brand</td>
-                 <td>@result.Data.Model</td>
-                 <td>@result.Data.Generation</td>
-                 <td>@result.Data.Plate</td>
-                 <td>@result.Data.Mileage</td>
-                 <td>@result.Data.ProductionYear</td>
-             </tr>
-             </tbody>
-        </table>
+        <div class="d-flex flex-row car-page-content">
+
+            <div>
+                <Card>
+                    <CardBody>
+                        <CardText>
+                            <div class="d-flex">
+                                <div class="car-title-image">
+                                    <img src="https://bi.im-g.pl/im/60/c8/17/z24937568Q,Opel-Corsa-2020.jpg" Alt="Car image">
+                                </div>
+                                <div class="car-title-text">
+                                    <h1>
+                                        @result.Data.MainName
+                                    </h1>
+                                </div>
+                            </div>
+
+                            <hr>
+
+                            <div class="car-info">
+                                Brand: @result.Data.Brand
+                            </div>
+                            <div class="car-info">
+                                Model: @result.Data.Model
+                            </div>
+                            <div class="car-info">
+                                Generation: @result.Data.Generation
+                            </div>
+                            <div class="car-info">
+                                Plate: @result.Data.Plate
+                            </div>
+                            <div class="car-info">
+                                Mileage: @result.Data.Mileage
+                            </div>
+                            <div class="car-info">
+                                ProductionYear: @result.Data.ProductionYear
+                            </div>
+                        </CardText>
+                        <hr>
+                        <a class="btn btn-primary" href="" role="button">Edit</a>
+                        <a class="btn btn-warning" href="" role="button">Delete</a>
+                    </CardBody>
+                </Card>
+            </div>
+
+            <div class="flex-fill">
+                <Expenses CarId=@result.Data.CarId.ToString()/>
+            </div>
+
+        </div>
     }
     else
     {
         <p>You might not have access to this resource</p>
     }
 }
-
 
 @code {
 

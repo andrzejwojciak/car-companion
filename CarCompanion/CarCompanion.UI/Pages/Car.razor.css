@@ -1,0 +1,26 @@
+﻿.car-page-content > div {
+    padding: 20px;
+}
+
+.car-info {
+    
+}
+
+.car-title-image {
+    width: 50%;
+}
+
+.car-title-text {
+    width: 50%;
+    text-align: center;
+}
+
+.car-title-image > img {
+    border: #c9c9c9 1px solid;
+    border-radius: 15px; 
+    padding: 5px; 
+    width: 100%;
+}
+
+.car-title {
+}

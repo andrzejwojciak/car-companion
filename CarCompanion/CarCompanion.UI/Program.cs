@@ -32,7 +32,8 @@ namespace CarCompanion.UI
             builder.Services.AddScoped<IRequestSenderService, RequestSenderService>();
             builder.Services.AddScoped<ICarService, CarService>();
             builder.Services.AddScoped<ILocalStorageService, LocalStorageService>();
-            
+            builder.Services.AddScoped<IExpenseService, ExpenseService>();
+
             var host = builder.Build();
 
             host.Services

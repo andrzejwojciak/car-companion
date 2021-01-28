@@ -1,0 +1,78 @@
+﻿@using CarCompanion.UI.Services.Interfaces
+@using CarCompanion.Shared.Results
+@using CarCompanion.Shared.Contract.V1.Responses.Expense
+@inject IExpenseService ExpenseService
+
+@if (result == null)
+{
+    <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Loading...</span>
+    </div>
+}
+else
+{
+    if (result.Success)
+    {
+        if (!result.Data.Expenses.Any())
+        {
+            <Card Style="width: 100%">
+                <p>Nothing here add some expenses!</p>
+            </Card>
+        }
+        else
+        {
+            <Card Style="width: 100%">
+                <h4 style="text-align: center; width: 100%; margin-top: 30px">
+                    Expenses
+                </h4>
+                <CardBody>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHeaderCell>Category</TableHeaderCell>
+                                <TableHeaderCell>Amount</TableHeaderCell>
+                                <TableHeaderCell>Date</TableHeaderCell>
+                                <TableHeaderCell>Description</TableHeaderCell>
+                                <TableHeaderCell>MileageInterval</TableHeaderCell>
+                                <TableHeaderCell>EndOfDateInterval</TableHeaderCell>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            @foreach (var expense in result.Data.Expenses)
+                            {
+                                <TableRow>
+                                    <TableRowCell>@expense.Category</TableRowCell>
+                                    <TableRowCell>@expense.Amount</TableRowCell>
+                                    <TableRowCell>@expense.Date</TableRowCell>
+                                    <TableRowCell>@expense.Description</TableRowCell>
+                                    <TableRowCell>@expense.MileageInterval</TableRowCell>
+                                    <TableRowCell>@expense.EndOfDateInterval</TableRowCell>
+                                </TableRow>
+                            }
+                        </TableBody>
+                    </Table>
+                </CardBody>
+            </Card>
+        }
+    }
+    else
+    {
+        <a>
+            You might be not able to see this resoure
+        </a>
+    }
+}
+
+@code {
+
+    [Parameter]
+    public string CarId { get; set; }
+
+    private ServiceResult<GetExpensesByCarIdResponse> result;
+
+    protected override async Task OnInitializedAsync()
+    {
+        result = await ExpenseService.GetExpensesByCarIdAsync(CarId);
+    }
+
+}

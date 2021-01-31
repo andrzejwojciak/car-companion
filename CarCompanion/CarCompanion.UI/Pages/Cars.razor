@@ -46,7 +46,7 @@ else
 
                 <Card Style="width: 18rem; padding: 0">
                     <CardBody Style="padding: 0;">
-                        <a class="btn btn-outline-dark w-100 h-100 d-flex justify-content-center align-items-center" href="add-car" style="background: rgb(159,203,213); background: linear-gradient(180deg, rgba(159,203,213,1) 0%, rgba(209,189,120,1) 100%);">
+                        <a href="cars/create" class="btn btn-outline-dark w-100 h-100 d-flex justify-content-center align-items-center" style="background: rgb(159,203,213); background: linear-gradient(180deg, rgba(159,203,213,1) 0%, rgba(209,189,120,1) 100%);">
                             <div class="d-flex flex-column">
                                 <h3>
                                     <i class="fas fa-plus"></i>
@@ -70,7 +70,6 @@ else
 }
 
 @code {
-
     private ServiceResult<GetUserCarsResponse> result;
 
     protected override async Task OnInitializedAsync()

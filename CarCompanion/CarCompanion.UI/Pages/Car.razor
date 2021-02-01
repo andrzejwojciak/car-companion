@@ -2,7 +2,6 @@
 @using CarCompanion.Shared.Contract.V1.Responses.Car
 @using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
-@using CarCompanion.UI.Components
 
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
@@ -58,7 +57,7 @@ else
                         </CardText>
                         <hr>
                         <a class="btn btn-primary" href="" role="button">Edit</a>
-                        <a class="btn btn-warning" href="" role="button">Delete</a>
+                        <Button Clicked="@DeleteCar" class="btn btn-warning">Delete</Button>
                     </CardBody>
                 </Card>
             </div>
@@ -76,11 +75,16 @@ else
 }
 
 @code {
-
     [Parameter]
     public string CarId { get; set; }
-
+    
     private ServiceResult<GetCarByIdResponse> result;
+
+    private void DeleteCar()
+    {
+        CarService.DeleteCarAsync(result.Data.CarId.ToString());
+        NavigationManager.NavigateTo("cars");
+    }
 
     protected override async Task OnInitializedAsync()
     {

@@ -31,5 +31,9 @@ namespace CarCompanion.UI.Services
             return await _requestSenderService.SendAuthPostRequestAsync<CreateCarResponse>(Url, request);
         }
 
+        public async Task<ServiceResult<DeleteCarResponse>> DeleteCarAsync(string carId)
+        {
+            return await _requestSenderService.SendAuthDeleteRequestAsync<DeleteCarResponse>(Url + "/" + carId);
+        }
     }
 }

@@ -24,6 +24,24 @@ namespace CarCompanion.UI.Services
             _httpClient = httpClient;
         }
 
+        public async Task<ServiceResult<T>> SendAuthDeleteRequestAsync<T>(string uri)
+        {
+            var accessToken = await _localStorageService.GetItem<string>("accessToken");
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri(uri),
+                Headers =
+                {
+                    {"Authorization", $"Bearer {accessToken}"},
+                    {"Accept", "application/json"}
+                }
+            };
+            
+            return await SendRequest<T>(httpRequestMessage);
+        }
+
         public async Task<ServiceResult<T>> SendAuthPostRequestAsync<T>(string uri, object value)
         {
             var accessToken = await _localStorageService.GetItem<string>("accessToken");

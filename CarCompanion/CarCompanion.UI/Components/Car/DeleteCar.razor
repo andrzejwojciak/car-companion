@@ -1,0 +1,47 @@
+@using CarCompanion.UI.Services.Interfaces
+
+@inject ICarService CarService
+@inject NavigationManager NavigationManager
+
+<Button Clicked="@ShowModal" class="btn btn-warning">Delete</Button>
+
+<Modal @ref="modalRef">
+    <ModalBackdrop/>
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>Are you sure?</ModalTitle>
+            <CloseButton Clicked="@HideModal"/>
+        </ModalHeader>
+        <ModalBody>
+            <Button Color="Color.Secondary" Clicked="@DeleteCarAsync">Yes</Button>
+            <Button Color="Color.Primary" Clicked="@HideModal">No</Button>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+
+@code {
+
+    [Parameter]
+    public string CarId { get; set; }
+
+    private Modal modalRef;
+
+    private void ShowModal()
+    {
+        modalRef.Show();
+    }
+
+    private void HideModal()
+    {
+        modalRef.Hide();
+    }
+
+    private void DeleteCarAsync()
+    {
+        HideModal();
+        CarService.DeleteCarAsync(CarId);
+        NavigationManager.NavigateTo("cars");
+    }
+
+}

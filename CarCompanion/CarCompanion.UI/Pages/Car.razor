@@ -2,6 +2,8 @@
 @using CarCompanion.Shared.Contract.V1.Responses.Car
 @using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
+@using CarCompanion.UI.Components.Car
+@using CarCompanion.UI.Components
 
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
@@ -57,34 +59,29 @@ else
                         </CardText>
                         <hr>
                         <a class="btn btn-primary" href="" role="button">Edit</a>
-                        <Button Clicked="@DeleteCar" class="btn btn-warning">Delete</Button>
+                        <DeleteCar CarId=@CarId />
                     </CardBody>
                 </Card>
             </div>
 
             <div class="flex-fill">
-                <Expenses CarId=@result.Data.CarId.ToString()/>
+                <Expenses CarId=@CarId />
             </div>
 
         </div>
     }
     else
     {
-        <p>You might not have access to this resource</p>
+        <p>You might not have access to this XD resource</p>
     }
 }
 
 @code {
+
     [Parameter]
     public string CarId { get; set; }
-    
-    private ServiceResult<GetCarByIdResponse> result;
 
-    private void DeleteCar()
-    {
-        CarService.DeleteCarAsync(result.Data.CarId.ToString());
-        NavigationManager.NavigateTo("cars");
-    }
+    private ServiceResult<GetCarByIdResponse> result;
 
     protected override async Task OnInitializedAsync()
     {

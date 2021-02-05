@@ -7,104 +7,99 @@
 @inject ICarService CarService
 @inject NavigationManager NavigationManager
 
-<div>
-    <Validations Mode="ValidationMode.Auto" Model="@request">
-        <Validation>
-            <Field>
-                <FieldLabel>Email MainName</FieldLabel>
-                <TextEdit Placeholder="MainName" @bind-Text="@request.MainName">
-                    <FieldHelp>Please enter a main name</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        <Validation>
-            <Field>
-                <FieldLabel>Brand</FieldLabel>
-                <TextEdit Placeholder="Brand" @bind-Text="@request.Brand">
-                    <FieldHelp>Please enter a brand</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        
-        <Validation>
-            <Field>
-                <FieldLabel>Model</FieldLabel>
-                <TextEdit Placeholder="Model" @bind-Text="@request.Model">
-                    <FieldHelp>Please enter a model</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        
-        <Validation>
-            <Field>
-                <FieldLabel>Generation</FieldLabel>
-                <TextEdit Placeholder="Generation" @bind-Text="@request.Generation">
-                    <FieldHelp>Please enter a generation</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        
-        <Validation>
-            <Field>
-                <FieldLabel>Plate</FieldLabel>
-                <TextEdit Placeholder="Plate" @bind-Text="@request.Plate">
-                    <FieldHelp>Please enter a plate</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        <Validation>
-            <Field>
-                <FieldLabel>Mileage</FieldLabel>
-                <TextEdit type="number" Placeholder="Mileage" @bind-Number="@request.Mileage">
-                    <FieldHelp>Please enter a mileage</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        <Validation>
-            <Field>
-                <FieldLabel>ProductionYear</FieldLabel>
-                <TextEdit type="number" Placeholder="ProductionYear" @bind-Number="@request.ProductionYear">
-                    <FieldHelp>Please enter a production year</FieldHelp>
-                </TextEdit>
-            </Field>
-        </Validation>
-        <Validation>
-            <Button Color="Color.Primary" Clicked="@CreateCarAsync">
-                @if (loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                Login
-            </Button>
-        </Validation>
-    </Validations>
+<div class="d-flex justify-content-center">
+    <div class="p-5 m-3" style="background: white; width: 40%; border: #c9c9c9 1px solid; border-radius: 15px; ">
+        <Validations Mode="ValidationMode.Auto" Model="@request" ValidateOnLoad="false">
+            <Validation>
+                <Field>
+                    <FieldLabel>Main name</FieldLabel>
+                    <TextEdit Placeholder="MainName" @bind-Text="@request.MainName">
+                        <FieldHelp>Please enter a main name</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>Brand</FieldLabel>
+                    <TextEdit Placeholder="Brand" @bind-Text="@request.Brand">
+                        <FieldHelp>Please enter a brand</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
-        <p style="color: #ff0000;">@errorMessage</p>
-    }
+            <Validation>
+                <Field>
+                    <FieldLabel>Model</FieldLabel>
+                    <TextEdit Placeholder="Model" @bind-Text="@request.Model">
+                        <FieldHelp>Please enter a model</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
 
+            <Validation>
+                <Field>
+                    <FieldLabel>Generation</FieldLabel>
+                    <TextEdit Placeholder="Generation" @bind-Text="@request.Generation">
+                        <FieldHelp>Please enter a generation</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+
+            <Validation>
+                <Field>
+                    <FieldLabel>Plate</FieldLabel>
+                    <TextEdit Placeholder="Plate" @bind-Text="@request.Plate">
+                        <FieldHelp>Please enter a plate</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>Mileage</FieldLabel>
+                    <NumericEdit Placeholder="Mileage" @bind-Value="@request.Mileage">
+                        <FieldHelp>Please enter a mileage</FieldHelp>
+                    </NumericEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>ProductionYear</FieldLabel>
+                    <NumericEdit Placeholder="ProductionYear" @bind-Value="@request.ProductionYear">
+                        <FieldHelp>Please enter a production year</FieldHelp>
+                    </NumericEdit>
+                </Field>
+            </Validation>
+            <hr/>
+            <Validation>
+                <Button Color="Color.Primary" Clicked="@CreateCarAsync">
+                    @if (loading)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    Create
+                </Button>
+            </Validation>
+        </Validations>
+    </div>
 </div>
 
 @code{
     private ServiceResult<CreateCarResponse> result;
     private CreateCarRequest request = new();
     private bool loading;
-    private string errorMessage;
 
     private async void CreateCarAsync()
     {
         loading = true;
-        request.ProductionYear = 2000;
         result = await CarService.CreateCarAsync(request);
 
         if (result.Success)
         {
-            NavigationManager.NavigateTo("/cars");
+            NavigationManager.NavigateTo("/cars/" + result.Data.CarId);
         }
 
-        errorMessage = "something went wrong try again later!";
         loading = false;
         StateHasChanged();
     }
+
 }

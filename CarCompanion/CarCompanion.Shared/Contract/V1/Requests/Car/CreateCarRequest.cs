@@ -27,6 +27,6 @@ namespace CarCompanion.Shared.Contract.V1.Requests.Car
         
         [Range(1000, 6000, ErrorMessage = "Value for ProductionYear must be between 10000 and 6000")]
         [Required]
-        public int ProductionYear { get; set; }             
+        public int? ProductionYear { get; set; }             
     }
 }

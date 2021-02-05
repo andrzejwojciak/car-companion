@@ -54,11 +54,11 @@ else
                                 Mileage: @result.Data.Mileage
                             </div>
                             <div class="car-info">
-                                ProductionYear: @result.Data.ProductionYear
+                                Production year: @result.Data.ProductionYear
                             </div>
                         </CardText>
                         <hr>
-                        <a class="btn btn-primary" href="" role="button">Edit</a>
+                        <EditCar CarId=@CarId />
                         <DeleteCar CarId=@CarId />
                     </CardBody>
                 </Card>
@@ -77,7 +77,6 @@ else
 }
 
 @code {
-
     [Parameter]
     public string CarId { get; set; }
 

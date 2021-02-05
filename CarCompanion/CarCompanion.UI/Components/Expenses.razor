@@ -1,6 +1,8 @@
 ﻿@using CarCompanion.UI.Services.Interfaces
+@using CarCompanion.UI.Components.Expense
 @using CarCompanion.Shared.Results
 @using CarCompanion.Shared.Contract.V1.Responses.Expense
+
 @inject IExpenseService ExpenseService
 
 @if (result == null)
@@ -17,6 +19,7 @@ else
         {
             <Card Style="width: 100%">
                 <p>Nothing here add some expenses!</p>
+                <CreateExpense />
             </Card>
         }
         else
@@ -51,6 +54,7 @@ else
                             }
                         </TableBody>
                     </Table>
+                    <CreateExpense CarId=@CarId UpdateExpenses="@UpdateExpensesListAsync"/>
                 </CardBody>
             </Card>
         }
@@ -64,13 +68,23 @@ else
 }
 
 @code {
-
     [Parameter]
     public string CarId { get; set; }
 
     private ServiceResult<GetExpensesByCarIdResponse> result;
 
+    private async Task UpdateExpensesListAsync()
+    {
+        await GetExpensesAsync();
+        StateHasChanged();
+    }
+
     protected override async Task OnInitializedAsync()
+    {
+        await GetExpensesAsync();
+    }
+
+    private async Task GetExpensesAsync()
     {
         result = await ExpenseService.GetExpensesByCarIdAsync(CarId);
     }

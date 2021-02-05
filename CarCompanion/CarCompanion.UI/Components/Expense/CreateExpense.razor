@@ -1,0 +1,143 @@
+@using CarCompanion.Shared.Contract.V1.Requests.Expense
+@using CarCompanion.Shared.Contract.V1.Responses.Expense
+@using CarCompanion.Shared.Results
+@using CarCompanion.UI.Services.Interfaces
+
+@inject IExpenseService ExpenseService
+
+<Button Clicked="@ShowModal" class="btn-success">Add expense</Button>
+
+<Modal @ref="createExpenseModal">
+    <ModalBackdrop/>
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>Add a new expense</ModalTitle>
+            <CloseButton Clicked="@HideModal"/>
+        </ModalHeader>
+        <ModalBody>
+            <Validations @ref="modalValidations" Mode="ValidationMode.Auto" Model="@request" ValidateOnLoad="false">
+                <Validation>
+                    <Field>
+                        <FieldLabel>Amount</FieldLabel>
+                        <NumericEdit Placeholder="Amount" @bind-Value="@request.Amount">
+                            <FieldHelp>Please enter a amount</FieldHelp>
+                        </NumericEdit>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field>
+                        <FieldLabel>Description</FieldLabel>
+                        <TextEdit Placeholder="Description" @bind-Text="@request.Description">
+                            <FieldHelp>Please enter a description</FieldHelp>
+                        </TextEdit>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field>
+                        <FieldLabel>Next #interval, replacement# for:</FieldLabel>
+                        <NumericEdit Placeholder="Mileage interval" @bind-Value="@request.MileageInterval">
+                            <FieldHelp>Please enter a mileage interval</FieldHelp>
+                        </NumericEdit>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field>
+                        <FieldLabel>Next #interval, replacement# at:</FieldLabel>
+                        <DateEdit @bind-Date="@request.EndOfDateInterval">
+                            <FieldHelp>Please enter a date interval</FieldHelp>
+                        </DateEdit>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field>
+                        <FieldLabel>Date</FieldLabel>
+                        <DateEdit @bind-Date="@request.Date">
+                            <FieldHelp>Please enter a date</FieldHelp>
+                        </DateEdit>
+                    </Field>
+                </Validation>
+                <Validation>
+                    <Field>
+                        <FieldLabel>Category</FieldLabel>
+                        <Select @bind-SelectedValue="@request.Category">
+                            <SelectItem Value="@(string.Empty)">Select category</SelectItem>
+                            <SelectItem Value="@("fuel")">Fuel</SelectItem>
+                            <SelectItem Value="@("insurance")">Insurance</SelectItem>
+                            <SelectItem Value="@("other")">Other</SelectItem>
+                            <SelectItem Value="@("repair")">Repair</SelectItem>
+                            <SelectItem Value="@("utilization")">Utilization</SelectItem>
+                        </Select>
+                    </Field>
+                </Validation>
+            </Validations>
+
+            @if (!string.IsNullOrEmpty(errorMessage))
+            {
+                <p>@errorMessage</p>
+            }
+
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+
+            <Button Color="Color.Primary" Clicked="@CreateExpenseAsync">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Create
+            </Button>
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+
+@code{
+    [Parameter]
+    public string CarId { get; set; }
+    
+    [Parameter]
+    public EventCallback<Task> UpdateExpenses { get; set; }
+
+    string errorMessage;
+    bool loading;
+
+    //TODO: There need be a CreateExpenseResponse
+    ServiceResult<ExpenseResponse> result;
+    CreateExpenseRequest request = new();
+    Validations modalValidations;
+    Modal createExpenseModal;
+    
+
+    Task ShowModal()
+    {
+        modalValidations.ClearAll();
+        request = new CreateExpenseRequest();
+
+        createExpenseModal.Show();
+        return Task.CompletedTask;
+    }
+
+    Task HideModal()
+    {
+        createExpenseModal.Hide();
+        return Task.CompletedTask;
+    }
+
+    private async void CreateExpenseAsync()
+    {
+        loading = true;
+        result = await ExpenseService.CreateExpenseAsync(request, CarId);
+
+        if (result.Success)
+        {
+            await UpdateExpenses.InvokeAsync();   
+            await HideModal();
+            loading = false;
+        }
+
+        errorMessage = result.ErrorMessage;
+        loading = false;
+    }
+
+}

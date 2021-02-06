@@ -11,7 +11,7 @@
 @inject NavigationManager NavigationManager
 
 <div>
-    <Validations Mode="ValidationMode.Auto" Model="@loginRequest">
+    <Validations @ref="loginValidations" Mode="ValidationMode.Auto" Model="@loginRequest" ValidateOnLoad="false">
         <Validation>
             <Field>
                 <FieldLabel>Email address</FieldLabel>
@@ -28,15 +28,13 @@
                 </TextEdit>
             </Field>
         </Validation>
-        <Validation>
-            <Button Color="Color.Primary" Clicked="@SendLoginRequest">
-                @if (loading)
-                {
-                    <span class="spinner-border spinner-border-sm mr-1"></span>
-                }
-                Login
-            </Button>
-        </Validation>
+        <Button Color="Color.Primary" Clicked="@Submit">
+            @if (loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Login
+        </Button>
     </Validations>
 
     @if (!string.IsNullOrEmpty(errorMessage))
@@ -49,7 +47,8 @@
 
 @code {
     private ServiceResult<AuthSuccessResponse> result;
-    private LoginRequest loginRequest = new LoginRequest();
+    Validations loginValidations;
+    private LoginRequest loginRequest = new();
     private string errorMessage;
     private bool loading;
 
@@ -58,6 +57,14 @@
         if (await AuthService.IsAuthorizedAsync())
         {
             NavigationManager.NavigateTo("");
+        }
+    }
+
+    private void Submit()
+    {
+        if (loginValidations.ValidateAll())
+        {
+            SendLoginRequest();
         }
     }
 

@@ -79,8 +79,7 @@
         </ModalBody>
         <ModalFooter>
             <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
-
-            <Button Color="Color.Primary" Clicked="@CreateExpenseAsync">
+            <Button Color="Color.Primary" Clicked="@Submit">
                 @if (loading)
                 {
                     <span class="spinner-border spinner-border-sm mr-1"></span>
@@ -122,6 +121,14 @@
     {
         createExpenseModal.Hide();
         return Task.CompletedTask;
+    }
+
+    private void Submit()
+    {
+        if (modalValidations.ValidateAll())
+        {
+            CreateExpenseAsync();
+        }
     }
 
     private async void CreateExpenseAsync()

@@ -141,6 +141,7 @@
             await UpdateExpenses.InvokeAsync();   
             await HideModal();
             loading = false;
+            return;
         }
 
         errorMessage = result.ErrorMessage;

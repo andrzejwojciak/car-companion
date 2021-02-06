@@ -1,0 +1,73 @@
+@using CarCompanion.Shared.Results
+@using CarCompanion.Shared.Contract.V1.Responses.Expense
+@using CarCompanion.UI.Services.Interfaces
+
+@inject IExpenseService ExpenseService 
+
+<Button Clicked="@ShowModal" Color="Color.Danger">Delete</Button>
+
+<Modal @ref="modalRef">
+    <ModalBackdrop/>
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>Are you sure?</ModalTitle>
+            <CloseButton Clicked="@HideModal"/>
+        </ModalHeader>
+        <ModalBody>
+            <Button Color="Color.Secondary" Clicked="@DeleteExpenseAsync">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Delete
+            </Button>
+            <Button Color="Color.Primary" Clicked="@HideModal">No</Button>
+        </ModalBody>
+    </ModalContent>
+</Modal>
+
+@code{
+    [Parameter]
+    public string CarId { get; set; } 
+    
+    [Parameter]
+    public string ExpenseId { get; set; } 
+    
+    [Parameter]
+    public EventCallback<Task> UpdateExpenses { get; set; }
+    
+    string errorMessage;
+    bool loading;
+    private Modal modalRef;
+    private ServiceResult<DeleteExpenseResponse> result;
+
+    Task ShowModal()
+    {
+        modalRef.Show();
+        return Task.CompletedTask;
+    }
+
+    Task HideModal()
+    {
+        modalRef.Hide();
+        return Task.CompletedTask;
+    }
+
+    private async void DeleteExpenseAsync()
+    {
+        loading = true;
+        result = await ExpenseService.DeleteExpenseAsync(CarId, ExpenseId);
+
+        if (result.Success)
+        {
+            await UpdateExpenses.InvokeAsync();
+            await HideModal();
+            loading = false;
+            return;
+        }
+
+        errorMessage = result.ErrorMessage;
+        loading = false;
+    }
+}
+

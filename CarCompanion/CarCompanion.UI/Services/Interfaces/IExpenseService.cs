@@ -9,5 +9,6 @@ namespace CarCompanion.UI.Services.Interfaces
     {
         Task<ServiceResult<GetExpensesByCarIdResponse>> GetExpensesByCarIdAsync(string carId);
         Task<ServiceResult<ExpenseResponse>> CreateExpenseAsync(CreateExpenseRequest request, string carId);
+        Task<ServiceResult<DeleteExpenseResponse>> DeleteExpenseAsync(string carId, string expenseId);
     }
 }

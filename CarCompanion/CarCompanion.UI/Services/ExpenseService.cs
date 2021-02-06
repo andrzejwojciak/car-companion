@@ -29,5 +29,11 @@ namespace CarCompanion.UI.Services
             var uri = string.Format(Url, carId);
             return await _requestSenderService.SendAuthPostRequestAsync<ExpenseResponse>(uri, request);
         }
+        
+        public async Task<ServiceResult<DeleteExpenseResponse>> DeleteExpenseAsync(string carId, string expenseId)
+        {
+            var uri = string.Format(Url, carId) + $"/{expenseId}";
+            return await _requestSenderService.SendAuthDeleteRequestAsync<DeleteExpenseResponse>(uri);
+        }
     }
 }

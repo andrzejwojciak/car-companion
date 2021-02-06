@@ -19,7 +19,7 @@ else
         {
             <Card Style="width: 100%">
                 <p>Nothing here add some expenses!</p>
-                <CreateExpense />
+                <CreateExpense/>
             </Card>
         }
         else
@@ -50,6 +50,9 @@ else
                                     <TableRowCell>@expense.Description</TableRowCell>
                                     <TableRowCell>@expense.MileageInterval</TableRowCell>
                                     <TableRowCell>@expense.EndOfDateInterval</TableRowCell>
+                                    <TableRowCell>
+                                        <DeleteExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()" UpdateExpenses="@UpdateExpensesListAsync"/>
+                                    </TableRowCell>
                                 </TableRow>
                             }
                         </TableBody>
@@ -73,6 +76,7 @@ else
 
     private ServiceResult<GetExpensesByCarIdResponse> result;
 
+    //TODO: Create states to not download expenses all the time
     private async Task UpdateExpensesListAsync()
     {
         await GetExpensesAsync();

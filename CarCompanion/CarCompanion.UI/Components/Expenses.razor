@@ -1,5 +1,6 @@
 ﻿@using CarCompanion.UI.Services.Interfaces
 @using CarCompanion.UI.Components.Expense
+@using CarCompanion.UI.Components.UI
 @using CarCompanion.Shared.Results
 @using CarCompanion.Shared.Contract.V1.Responses.Expense
 
@@ -7,9 +8,7 @@
 
 @if (result == null)
 {
-    <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
+    <LoadingSpinner />
 }
 else
 {
@@ -19,7 +18,7 @@ else
         {
             <Card Style="width: 100%">
                 <p>Nothing here add some expenses!</p>
-                <CreateExpense/>
+                <CreateExpense CarId="@CarId" UpdateExpenses="@UpdateExpensesListAsync"/>
             </Card>
         }
         else
@@ -29,35 +28,45 @@ else
                     Expenses
                 </h4>
                 <CardBody>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHeaderCell>Category</TableHeaderCell>
-                                <TableHeaderCell>Amount</TableHeaderCell>
-                                <TableHeaderCell>Date</TableHeaderCell>
-                                <TableHeaderCell>Description</TableHeaderCell>
-                                <TableHeaderCell>MileageInterval</TableHeaderCell>
-                                <TableHeaderCell>EndOfDateInterval</TableHeaderCell>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            @foreach (var expense in result.Data.Expenses)
-                            {
-                                <TableRow>
-                                    <TableRowCell>@expense.Category</TableRowCell>
-                                    <TableRowCell>@expense.Amount</TableRowCell>
-                                    <TableRowCell>@expense.Date</TableRowCell>
-                                    <TableRowCell>@expense.Description</TableRowCell>
-                                    <TableRowCell>@expense.MileageInterval</TableRowCell>
-                                    <TableRowCell>@expense.EndOfDateInterval</TableRowCell>
-                                    <TableRowCell>
-                                        <DeleteExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()" UpdateExpenses="@UpdateExpensesListAsync"/>
-                                    </TableRowCell>
-                                </TableRow>
-                            }
-                        </TableBody>
-                    </Table>
-                    <CreateExpense CarId=@CarId UpdateExpenses="@UpdateExpensesListAsync"/>
+                    @foreach (var expense in result.Data.Expenses)
+                    {
+                        expenseCollapeses.Add((expense.ExpenseId.ToString(),false));
+                        <Collapse Visible="@IsToggled(expense.ExpenseId.ToString())" Class="w-100 mb-3">
+                            <CollapseHeader>
+                                <Heading Size="HeadingSize.Is5">
+                                    <div class="d-flex justify-content-between align-items-center h-100">
+                                        <div>
+                                            @expense.Date
+                                            Category: @expense.Category
+                                        </div>
+                                        <div>
+                                            $@expense.Amount 
+                                            <span @onclick="@(e => ToggleCollapse(expense.ExpenseId.ToString()))" class="ml-1" style="cursor: pointer;">
+                                                @if (@IsToggled(expense.ExpenseId.ToString()))
+                                                {
+                                                    <Icon Name="IconName.AngleUp"/>
+                                                }
+                                                else
+                                                {
+                                                    <Icon Name="IconName.AngleDown"/>
+                                                }
+                                            </span>
+                                        </div>
+                                    </div>
+                                </Heading>
+                            </CollapseHeader>
+                            <CollapseBody>
+                                Description: @expense.Description <br/>
+                                Mileage of next interval: @expense.MileageInterval <br/>
+                                Date of next interval: @expense.EndOfDateInterval <br/>
+                                <DeleteExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()" UpdateExpenses="@UpdateExpensesListAsync"/>
+                                <EditExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()"/>
+                            </CollapseBody>
+                        </Collapse>
+                    }
+                    <div Class="mt-1">
+                        <CreateExpense CarId="@CarId" UpdateExpenses="@UpdateExpensesListAsync"/>
+                    </div>
                 </CardBody>
             </Card>
         }
@@ -71,10 +80,24 @@ else
 }
 
 @code {
+
     [Parameter]
     public string CarId { get; set; }
 
+    List<(string, bool)> expenseCollapeses = new();
     private ServiceResult<GetExpensesByCarIdResponse> result;
+
+    private void ToggleCollapse(string expenseId)
+    {
+        var index = expenseCollapeses.FindIndex(x => x.Item1 == expenseId);
+        expenseCollapeses[index] = (expenseId, !expenseCollapeses[index].Item2);
+    }
+
+    private bool IsToggled(string expenseId)
+    {
+        var (id, toggled) = expenseCollapeses.First(x => x.Item1 == expenseId);
+        return toggled;
+    }
 
     //TODO: Create states to not download expenses all the time
     private async Task UpdateExpensesListAsync()

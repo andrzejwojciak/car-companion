@@ -3,6 +3,7 @@
 @using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
 @using CarCompanion.UI.Components.Car
+@using CarCompanion.UI.Components.UI
 @using CarCompanion.UI.Components
 
 @inject NavigationManager NavigationManager
@@ -11,9 +12,7 @@
 
 @if (result == null)
 {
-    <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
+    <LoadingSpinner />
 }
 else
 {
@@ -21,21 +20,15 @@ else
     {
         <div class="d-flex flex-row car-page-content">
 
-            <div>
+            <div class="w-50">
                 <Card>
                     <CardBody>
                         <CardText>
-                            <div class="d-flex">
-                                <div class="car-title-image">
-                                    <img src="https://bi.im-g.pl/im/60/c8/17/z24937568Q,Opel-Corsa-2020.jpg" Alt="Car image">
-                                </div>
-                                <div class="car-title-text">
-                                    <h1>
-                                        @result.Data.MainName
-                                    </h1>
-                                </div>
+                            <div class="car-title-image">
+                                <img src="https://www.wyborkierowcow.pl/wp-content/uploads/2020/08/Alfa-Romeo-Giulia-2020-1024x535.jpg" Alt="Car image">
+                                @result.Data.MainName
                             </div>
-
+                            
                             <hr>
 
                             <div class="car-info">
@@ -57,9 +50,12 @@ else
                                 Production year: @result.Data.ProductionYear
                             </div>
                         </CardText>
+                        
                         <hr>
+                        
                         <EditCar CarId=@CarId />
                         <DeleteCar CarId=@CarId />
+                        
                     </CardBody>
                 </Card>
             </div>
@@ -77,6 +73,7 @@ else
 }
 
 @code {
+
     [Parameter]
     public string CarId { get; set; }
 

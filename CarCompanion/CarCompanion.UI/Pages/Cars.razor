@@ -2,6 +2,7 @@
 @using CarCompanion.Shared.Contract.V1.Responses.Car
 @using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
+@using CarCompanion.UI.Components.UI
 
 @inject HttpClient Http
 @inject IAuthService AuthService
@@ -16,9 +17,7 @@
 
 @if (result == null)
 {
-    <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Loading...</span>
-    </div>
+    <LoadingSpinner />
 }
 else
 {
@@ -31,7 +30,7 @@ else
                 @foreach (var car in result.Data.Cars)
                 {
                     <Card Style="width: 18rem">
-                        <CardImage Source="https://bi.im-g.pl/im/60/c8/17/z24937568Q,Opel-Corsa-2020.jpg" Alt="Car image">
+                        <CardImage Source="https://www.wyborkierowcow.pl/wp-content/uploads/2020/08/Alfa-Romeo-Giulia-2020-1024x535.jpg" Alt="Car image">
                         </CardImage>
                         <CardBody>
                             <CardTitle Size="5">@car.MainName</CardTitle>

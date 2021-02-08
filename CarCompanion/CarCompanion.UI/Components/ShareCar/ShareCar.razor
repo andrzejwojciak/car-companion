@@ -1,0 +1,136 @@
+@using System.Threading
+@using carcompanion.Contract.V1.Requests.ShareCar
+@using CarCompanion.Shared.Contract.V1.Responses.ShareCar
+@using CarCompanion.Shared.Results
+@using CarCompanion.UI.Services.Interfaces
+
+@inject IJSRuntime JSRuntime
+@inject IShareKeyService ShareKeyService
+
+<Button Clicked="@ShowModal">
+    <i class="fas fa-share-square"></i>
+</Button>
+
+<Modal @ref="modalRef">
+    <ModalBackdrop/>
+    <ModalContent IsCentered="true">
+        <ModalHeader>
+            <ModalTitle>Share car</ModalTitle>
+            <CloseButton Clicked="@HideModal"/>
+        </ModalHeader>
+        <ModalBody>
+            @if (string.IsNullOrEmpty(shareKey))
+            {
+                <Field>
+                    <FieldLabel>Role</FieldLabel>
+                    <Select @bind-SelectedValue="@role">
+                        <SelectItem Value="@(string.Empty)">Select role</SelectItem>
+                        <SelectItem Value="@("editor")">Editor</SelectItem>
+                        <SelectItem Value="@("viewer")">Viewer</SelectItem>
+                    </Select>
+                </Field>
+            }
+            else
+            {
+                <FieldBody ColumnSize="ColumnSize.IsFull.OnTablet.Is10.OnDesktop">
+                    <Addons>
+                        <Addon AddonType="AddonType.Body">
+                            <TextEdit value="@shareKey" readonly/>
+                        </Addon>
+                        <Addon AddonType="AddonType.End">
+                            @if (showTooltip)
+                            {
+                                <Tooltip Text="Copied to clipboard" Fade="true" AlwaysActive="true">
+                                    <Button Color="Color.Primary" Clicked="@CopyTextToClipboard">Copy</Button>
+                                </Tooltip>
+                            }
+                            else
+                            {
+                                <Button Color="Color.Primary" Clicked="@CopyTextToClipboard">Copy</Button>
+                            }
+                        </Addon>
+                    </Addons>
+                </FieldBody>
+            }
+        </ModalBody>
+        <ModalFooter>
+            <Button Color="Color.Secondary" Clicked="@HideModal">Close</Button>
+            @if (string.IsNullOrEmpty(shareKey))
+            {
+                <Button Color="Color.Primary" Clicked="@GetShareKey" disabled="@string.IsNullOrEmpty(role)">
+                    @if (loading)
+                    {
+                        <span class="spinner-border spinner-border-sm mr-1"></span>
+                    }
+                    Get share key
+                </Button>
+            }
+            else
+            {
+                <Button Color="Color.Primary" Clicked="@ResetForm">Get another share key</Button>
+            }
+        </ModalFooter>
+    </ModalContent>
+</Modal>
+
+
+@code {
+
+    [Parameter]
+    public string CarId { get; set; }
+
+    private string role;
+    private bool loading = false;
+    private string shareKey;
+    private bool showTooltip = false;
+    private ServiceResult<CreateShareKeyResponse> result;
+
+    // reference to the modal component
+    private Modal modalRef;
+
+    private void ShowModal()
+    {
+        modalRef.Show();
+    }
+
+    private void HideModal()
+    {
+        shareKey = null;
+        role = null;
+        modalRef.Hide();
+    }
+
+    private async void GetShareKey()
+    {
+        loading = true;
+        result = await ShareKeyService.GetShareKeyAsync(CarId, new CreateShareKeyRequest {Role = role});
+        
+        if (result.Success)
+        {
+            shareKey = result.Data.ShareKey.ToString();
+        }
+        
+        loading = false;
+        StateHasChanged();
+    }
+
+    private void ResetForm()
+    {
+        shareKey = null;
+    }
+
+    private async Task CopyTextToClipboard()
+    {
+        await JSRuntime.InvokeVoidAsync("clipboardCopy.copyText", shareKey);
+        await ShowToolTipAsync();
+    }
+
+    private async Task ShowToolTipAsync()
+    {
+        showTooltip = true;
+        StateHasChanged();
+        await Task.Delay(1000);
+        showTooltip = false;
+    }
+
+}

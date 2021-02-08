@@ -3,8 +3,9 @@
 @using CarCompanion.Shared.Results
 @using CarCompanion.UI.Services.Interfaces
 @using CarCompanion.UI.Components.Car
+@using CarCompanion.UI.Components.ShareCar
 @using CarCompanion.UI.Components.UI
-@using CarCompanion.UI.Components
+@using CarCompanion.UI.Components.Expense
 
 @inject NavigationManager NavigationManager
 @inject IAuthService AuthService
@@ -53,8 +54,18 @@ else
                         
                         <hr>
                         
-                        <EditCar CarId=@CarId />
-                        <DeleteCar CarId=@CarId />
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <EditCar CarId=@CarId />
+                                <DeleteCar CarId=@CarId />
+                            </div>
+                            <div>
+                                <Tooltip Text="Share car">
+                                    <ShareCar CarId=@CarId />
+                                </Tooltip>
+                            </div>
+                        </div>
+                        
                         
                     </CardBody>
                 </Card>

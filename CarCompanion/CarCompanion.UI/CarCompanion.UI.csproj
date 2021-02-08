@@ -33,5 +33,9 @@
     <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\ICON-LICENSE" />
     <_ContentIncludedByDefault Remove="wwwroot\css\open-iconic\README.md" />
   </ItemGroup>
+  
+  <ItemGroup>
+    <None Include="wwwroot\js\CopyToClipboard.js" />
+  </ItemGroup>
 
 </Project>

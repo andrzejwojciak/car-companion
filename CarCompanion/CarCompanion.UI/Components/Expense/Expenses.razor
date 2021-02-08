@@ -40,7 +40,9 @@ else
                                             Category: @expense.Category
                                         </div>
                                         <div>
-                                            $@expense.Amount 
+                                            <span style="color: #186a30">
+                                                $@expense.Amount
+                                            </span>
                                             <span @onclick="@(e => ToggleCollapse(expense.ExpenseId.ToString()))" class="ml-1" style="cursor: pointer;">
                                                 @if (@IsToggled(expense.ExpenseId.ToString()))
                                                 {
@@ -60,7 +62,7 @@ else
                                 Mileage of next interval: @expense.MileageInterval <br/>
                                 Date of next interval: @expense.EndOfDateInterval <br/>
                                 <DeleteExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()" UpdateExpenses="@UpdateExpensesListAsync"/>
-                                <EditExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()"/>
+                                <EditExpense CarId="@CarId" ExpenseId="@expense.ExpenseId.ToString()" UpdateExpenses="@UpdateExpensesListAsync"/>
                             </CollapseBody>
                         </Collapse>
                     }

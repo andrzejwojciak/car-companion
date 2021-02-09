@@ -9,14 +9,24 @@ services:
             MSSQL_PID: "Express"
         ports: 
             - "11433:1433"
-    
-    carcompanion-api:
+
+    carcompanion-frontend:
         build: 
-            context: ./carcompanion 
-            dockerfile: Dockerfile
+            context: CarCompanion
+            dockerfile: CarCompanion.UI/Dockerfile
+        ports: 
+            - "4200:80"
+        depends_on:
+            - mssql-server
+    
+    carcompanion-backend:
+        build: 
+            context: CarCompanion
+            dockerfile: CarCompanion.Api/Dockerfile
         ports: 
             - "8080:80"
         depends_on:
-            - mssql-server
+            - carcompanion-frontend
         environment: 
             ConnectionStrings:Database: "Server= mssql-server; Database=CarcompanionDB; User=SA; Password=Str@ngPassword2020!"
+            

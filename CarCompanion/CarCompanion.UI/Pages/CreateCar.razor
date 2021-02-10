@@ -9,7 +9,7 @@
 
 <div class="d-flex justify-content-center">
     <div class="p-5 m-3" style="background: white; width: 40%; border: #c9c9c9 1px solid; border-radius: 15px; ">
-        <Validations Mode="ValidationMode.Auto" Model="@request" ValidateOnLoad="false">
+        <Validations @ref="createCarValidation" Mode="ValidationMode.Auto" Model="@request" ValidateOnLoad="false">
             <Validation>
                 <Field>
                     <FieldLabel>Main name</FieldLabel>
@@ -26,7 +26,6 @@
                     </TextEdit>
                 </Field>
             </Validation>
-
             <Validation>
                 <Field>
                     <FieldLabel>Model</FieldLabel>
@@ -70,23 +69,31 @@
                 </Field>
             </Validation>
             <hr/>
-            <Validation>
-                <Button Color="Color.Primary" Clicked="@CreateCarAsync">
-                    @if (loading)
-                    {
-                        <span class="spinner-border spinner-border-sm mr-1"></span>
-                    }
-                    Create
-                </Button>
-            </Validation>
+            <Button Color="Color.Primary" Clicked="@Submit">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Create
+            </Button>
         </Validations>
     </div>
 </div>
 
 @code{
+    private Validations createCarValidation;
     private ServiceResult<CreateCarResponse> result;
     private CreateCarRequest request = new();
     private bool loading;
+
+
+    private void Submit()
+    {
+        if (createCarValidation.ValidateAll())
+        {
+            CreateCarAsync();
+        }
+    }
 
     private async void CreateCarAsync()
     {

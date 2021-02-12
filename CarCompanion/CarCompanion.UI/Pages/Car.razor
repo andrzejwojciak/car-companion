@@ -94,7 +94,7 @@ else
     {
         if (!await AuthService.IsAuthorizedAsync())
         {
-            NavigationManager.NavigateTo("Login");
+            NavigationManager.NavigateTo("/auth");
         }
 
         result = await CarService.GetCarByIdAsync(CarId);

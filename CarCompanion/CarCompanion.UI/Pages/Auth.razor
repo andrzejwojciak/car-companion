@@ -1,0 +1,91 @@
+@page "/auth"
+
+@layout LoginLayout
+
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+@using CarCompanion.UI.Services
+@using CarCompanion.UI.Components.Auth
+@using CarCompanion.UI.Services.Interfaces
+
+<div class="d-flex justify-content-center h-100 w-100">
+    <div class="w-75 mx-auto px d-flex align-items-start flex-column h-100">
+        <div class="w-100">
+            <Tabs SelectedTab="@selectedTab" SelectedTabChanged="@OnSelectedTabChanged" Justified="true">
+                <Items>
+                    <Tab Name="login">Login</Tab>
+                    <Tab Name="register">Register</Tab>
+                </Items>
+                <Content>
+                    <TabPanel Name="login">
+                        <LoginForm/>
+                    </TabPanel>
+                    <TabPanel Name="register">
+                        <RegisterForm/>
+                    </TabPanel>
+                </Content>
+            </Tabs>
+            
+            <div class="mt-2 w-100 text-center">
+                ―― OR ――
+            </div>
+
+            <Button Color="Color.Primary" Block="true" class="mt-2">
+                <i class="fab fa-facebook"></i> Continue with Facebook
+            </Button>
+        </div>
+        <div class="mt-auto w-100">
+            <div class="d-flex justify-content-around w-75 mx-auto">
+                <div>
+                    <a href="https://instagram.com">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+
+                <div>
+                    <a href="https://twitter.com">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                </div>
+
+                <div>
+                    <a href="https://instagram.com">
+                        <i class="fab fa-linkedin-in"></i>
+                    </a>
+                </div>
+
+                <div>
+                    <a href="https://github.com/">
+                        <i class="fab fa-github"></i>
+                    </a>
+                </div>
+
+                <div>
+                    <a href="https://www.facebook.com/">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+    string selectedTab = "login";
+
+    private void OnSelectedTabChanged(string name)
+    {
+        selectedTab = name;
+    }
+
+    protected override async void OnInitialized()
+    {
+        if (await AuthService.IsAuthorizedAsync())
+        {
+            NavigationManager.NavigateTo("");
+        }
+    }
+
+}

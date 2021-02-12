@@ -20,7 +20,7 @@ there will be newsletter from car world
     {
         if (!await AuthService.IsAuthorizedAsync())
         {
-            NavigationManager.NavigateTo("Login");
+            NavigationManager.NavigateTo("/auth");
         }
     
     }

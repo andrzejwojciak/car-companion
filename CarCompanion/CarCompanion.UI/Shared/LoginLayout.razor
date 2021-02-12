@@ -1,18 +1,27 @@
 ﻿@inherits LayoutComponentBase
 
-<div class=".container" style="padding-top: 200px ">
-    <div class="row align-items-center">
-        <div class="col">
-        </div>
-        <div class="col">
-            <div class="card">
-                <h4 class="card-header">Car Companion Login View</h4>
-                <div class="card-body">
-                    @Body
-                </div>
+<div class="d-flex flex-row vw-100 vh-100">
+    <div style="width: 70%;">
+        <div class="d-flex flex-column">
+            <div class="p-3">
+                <img src="images/logo.png" alt="car companion logo">
+            </div>
+            <div style="width: 100%;">
+                <img src="images/mechanic.svg" alt="car mechanic" height="60%" width="60%" class="mx-auto d-block" />
+            </div>
+            <div style="text-align: center; width: 100%">
+                <Heading Alignment="TextAlignment.Center" Size="HeadingSize.Is1" Color="TextColor.Primary">
+                    Weclome in car companion!
+                </Heading>
+            </div>
+            <div style="text-align: center; width: 100%;">
+                <Paragraph Alignment="TextAlignment.Center">
+                    Add cars, menage expenses, share cars, genereate summaries and more.
+                </Paragraph>
             </div>
         </div>
-        <div class="col">
-        </div>
+    </div>
+    <div class="p-5" style="background: white; width: 30%;">
+        @Body
     </div>
 </div>

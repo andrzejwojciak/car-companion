@@ -12,6 +12,6 @@
         if (await AuthService.IsAuthorizedAsync())
             await AuthService.LogoutAsync();
 
-        NavigationManager.NavigateTo("/login");
+        NavigationManager.NavigateTo("/auth");
     }
 }

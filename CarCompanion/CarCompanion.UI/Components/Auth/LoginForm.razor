@@ -1,6 +1,3 @@
-@layout LoginLayout
-@page "/login"
-
 @using CarCompanion.Shared.Contract.Security.Requests
 @using CarCompanion.Shared.Contract.Security.Responses
 @using CarCompanion.Shared.Results
@@ -10,13 +7,12 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<div>
+<div class="pt-5">
     <Validations @ref="loginValidations" Mode="ValidationMode.Auto" Model="@loginRequest" ValidateOnLoad="false">
         <Validation>
             <Field>
-                <FieldLabel>Email address</FieldLabel>
+                <FieldLabel>Email</FieldLabel>
                 <TextEdit Placeholder="Enter email" @bind-Text="@loginRequest.Email">
-                    <FieldHelp>Please enter a valid email address</FieldHelp>
                 </TextEdit>
             </Field>
         </Validation>
@@ -24,11 +20,10 @@
             <Field>
                 <FieldLabel>Password</FieldLabel>
                 <TextEdit type="password" Placeholder="Enter email" @bind-Text="@loginRequest.Password">
-                    <FieldHelp>Please enter a valid password</FieldHelp>
                 </TextEdit>
             </Field>
         </Validation>
-        <Button Color="Color.Primary" Clicked="@Submit">
+        <Button Color="Color.Primary" Block="true" Clicked="@Submit" class="mt-5 mb-1">
             @if (loading)
             {
                 <span class="spinner-border spinner-border-sm mr-1"></span>
@@ -36,12 +31,11 @@
             Login
         </Button>
     </Validations>
-
+    
     @if (!string.IsNullOrEmpty(errorMessage))
     {
         <p style="color: #ff0000;">@errorMessage</p>
     }
-
 </div>
 
 
@@ -51,14 +45,6 @@
     private LoginRequest loginRequest = new();
     private string errorMessage;
     private bool loading;
-
-    protected override async void OnInitialized()
-    {
-        if (await AuthService.IsAuthorizedAsync())
-        {
-            NavigationManager.NavigateTo("");
-        }
-    }
 
     private void Submit()
     {

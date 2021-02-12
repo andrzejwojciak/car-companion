@@ -1,0 +1,129 @@
+@using CarCompanion.Shared.Contract.Security.Requests
+@using CarCompanion.Shared.Contract.Security.Responses
+@using CarCompanion.Shared.Results
+@using CarCompanion.UI.Services.Interfaces
+@using System
+
+@inject IAuthService AuthService
+@inject NavigationManager NavigationManager
+
+<div class="pt-5" @onkeydown="@Enter">
+    <Validations @ref="registerValidations" Mode="ValidationMode.Auto" Model="@request" ValidateOnLoad="false">
+        <Validation>
+            <Field>
+                <FieldLabel>Email</FieldLabel>
+                <TextEdit Placeholder="Enter email" @bind-Text="@request.Email">
+                    <Feedback>
+                        <ValidationError/>
+                    </Feedback>
+                </TextEdit>
+            </Field>
+        </Validation>
+        <Validation>
+            <Field>
+                <FieldLabel>Password</FieldLabel>
+                <TextEdit Role="TextRole.Password" Placeholder="Password" @bind-Text="@request.Password">
+                    <Feedback>
+                        <ValidationError/>
+                    </Feedback>
+                </TextEdit>
+            </Field>
+        </Validation>
+        <Validation Validator="@ConfirmPassword">
+            <Field>
+                <FieldLabel>Re-type Password</FieldLabel>
+                <TextEdit Role="TextRole.Password" Placeholder="Retype password">
+                    <Feedback>
+                        <ValidationError/>
+                    </Feedback>
+                </TextEdit>
+            </Field>
+        </Validation>
+        <Button Color="Color.Primary" Block="true" Clicked="@Submit" class="mt-5 mb-1">
+            @if (loading)
+            {
+                <span class="spinner-border spinner-border-sm mr-1"></span>
+            }
+            Create account
+        </Button>
+    </Validations>
+
+</div>
+
+<Snackbar @ref="snackbar">
+    <SnackbarBody>
+        @if (string.IsNullOrEmpty(errorMessage))
+        {
+            <span>
+                Account success fully create, you can login
+            </span>
+        }
+        else
+        {
+            <span>
+                @errorMessage
+            </span>
+        }
+    </SnackbarBody>
+</Snackbar>
+
+@code {
+    private Snackbar snackbar;
+    private Validations registerValidations;
+    private string errorMessage;
+    private ServiceResult<AuthSuccessResponse> result;
+    private RegisterRequest request = new();
+    private bool loading;
+
+
+    private void ConfirmPassword(ValidatorEventArgs e)
+    {
+        var password2 = Convert.ToString(e.Value);
+
+        if (password2?.Length < 6)
+        {
+            e.Status = ValidationStatus.Error;
+            e.ErrorText = "Password must be at least 6 characters long!";
+        }
+        else if (password2 != request.Password)
+        {
+            e.Status = ValidationStatus.Error;
+        }
+        else
+        {
+            e.Status = ValidationStatus.Success;
+        }
+    }
+
+    private void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Submit();
+        }
+    }
+
+    private void Submit()
+    {
+        if (registerValidations.ValidateAll())
+        {
+            SendRegisterRequest();
+        }
+    }
+
+    private async void SendRegisterRequest()
+    {
+        loading = true;
+        result = await AuthService.RegisterAsync(request);
+
+        if (!result.Success)
+        {
+            errorMessage = result.ErrorMessage;
+        }
+        
+        snackbar.Show();
+        loading = false;
+        StateHasChanged();
+    }
+
+}

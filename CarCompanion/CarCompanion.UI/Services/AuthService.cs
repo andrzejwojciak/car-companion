@@ -15,7 +15,7 @@ namespace CarCompanion.UI.Services
         private readonly ILocalStorageService _localStorageService;
         private readonly IRequestSenderService _requestSenderService;
         private readonly HttpClient _httpClient;
-        private const string ApiUrl = "http://localhost:8080/api/auth-manager/login";
+        private const string ApiUrl = "http://localhost:8080/api/auth-manager";
 
         public AuthService(HttpClient httpClient, ILocalStorageService localStorageService,
             IRequestSenderService requestSenderService)
@@ -33,14 +33,21 @@ namespace CarCompanion.UI.Services
                 Password = password
             };
 
+            const string uri = ApiUrl + "/login";
             var result =
-                await _requestSenderService.SendAuthPostRequestAsync<AuthSuccessResponse>(ApiUrl, loginRequest);
+                await _requestSenderService.SendAuthPostRequestAsync<AuthSuccessResponse>(uri, loginRequest);
 
             if (!result.Success)
                 return new ServiceResult<AuthSuccessResponse> {Success = false};
 
             SaveDataInLocalStorage(result.Data, email);
             return new ServiceResult<AuthSuccessResponse> {Success = true};
+        }
+        
+        public async Task<ServiceResult<AuthSuccessResponse>> RegisterAsync(RegisterRequest request)
+        {
+            const string uri = ApiUrl + "/register";
+            return await _requestSenderService.SendAuthPostRequestAsync<AuthSuccessResponse>(uri, request);
         }
 
         public async Task<bool> IsAuthorizedAsync()

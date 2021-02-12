@@ -7,7 +7,7 @@
 @inject IAuthService AuthService
 @inject NavigationManager NavigationManager
 
-<div class="pt-5">
+<div class="pt-5" @onkeydown="@Enter">
     <Validations @ref="loginValidations" Mode="ValidationMode.Auto" Model="@loginRequest" ValidateOnLoad="false">
         <Validation>
             <Field>
@@ -45,6 +45,14 @@
     private LoginRequest loginRequest = new();
     private string errorMessage;
     private bool loading;
+    
+    private void Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            Submit();
+        }
+    }
 
     private void Submit()
     {

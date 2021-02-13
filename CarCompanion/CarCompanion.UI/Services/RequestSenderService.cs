@@ -41,6 +41,24 @@ namespace CarCompanion.UI.Services
             
             return await SendRequest<T>(httpRequestMessage);
         }
+        
+        public async Task<ServiceResult<T>> SendAuthPostRequestAsync<T>(string uri)
+        {
+            var accessToken = await _localStorageService.GetItem<string>("accessToken");
+
+            var httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(uri),
+                Headers =
+                {
+                    {"Authorization", $"Bearer {accessToken}"},
+                    {"Accept", "application/json"}
+                }
+            };
+            
+            return await SendRequest<T>(httpRequestMessage);
+        }
 
         public async Task<ServiceResult<T>> SendAuthPostRequestAsync<T>(string uri, object value)
         {

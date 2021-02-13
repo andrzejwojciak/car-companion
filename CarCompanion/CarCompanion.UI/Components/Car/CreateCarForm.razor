@@ -1,0 +1,116 @@
+@using CarCompanion.Shared.Contract.V1.Requests.Car
+@using CarCompanion.Shared.Contract.V1.Responses.Car
+@using CarCompanion.Shared.Results
+@using CarCompanion.UI.Services.Interfaces
+
+@inject ICarService CarService
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-center">
+    <div class="p-5 m-3" style="background: white; width: 40%; border: #c9c9c9 1px solid; border-radius: 15px; ">
+        <div class="mb-4">
+            Create car using this form or <Button Color="Color.Primary" Clicked="@(async x => await ToggleForm.InvokeAsync())">click</Button> to use share key
+        </div>
+        <Validations @ref="createCarValidation" Mode="ValidationMode.Auto" Model="@request" ValidateOnLoad="false">
+            <Validation>
+                <Field>
+                    <FieldLabel>Main name</FieldLabel>
+                    <TextEdit Placeholder="MainName" @bind-Text="@request.MainName">
+                        <FieldHelp>Please enter a main name</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>Brand</FieldLabel>
+                    <TextEdit Placeholder="Brand" @bind-Text="@request.Brand">
+                        <FieldHelp>Please enter a brand</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>Model</FieldLabel>
+                    <TextEdit Placeholder="Model" @bind-Text="@request.Model">
+                        <FieldHelp>Please enter a model</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+
+            <Validation>
+                <Field>
+                    <FieldLabel>Generation</FieldLabel>
+                    <TextEdit Placeholder="Generation" @bind-Text="@request.Generation">
+                        <FieldHelp>Please enter a generation</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+
+            <Validation>
+                <Field>
+                    <FieldLabel>Plate</FieldLabel>
+                    <TextEdit Placeholder="Plate" @bind-Text="@request.Plate">
+                        <FieldHelp>Please enter a plate</FieldHelp>
+                    </TextEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>Mileage</FieldLabel>
+                    <NumericEdit Placeholder="Mileage" @bind-Value="@request.Mileage">
+                        <FieldHelp>Please enter a mileage</FieldHelp>
+                    </NumericEdit>
+                </Field>
+            </Validation>
+            <Validation>
+                <Field>
+                    <FieldLabel>ProductionYear</FieldLabel>
+                    <NumericEdit Placeholder="ProductionYear" @bind-Value="@request.ProductionYear">
+                        <FieldHelp>Please enter a production year</FieldHelp>
+                    </NumericEdit>
+                </Field>
+            </Validation>
+            <hr/>
+            <Button Color="Color.Primary" Clicked="@Submit">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Create
+            </Button>
+        </Validations>
+    </div>
+</div>
+
+@code{
+    [Parameter]
+    public EventCallback<Task> ToggleForm { get; set; }
+
+    private Validations createCarValidation;
+    private ServiceResult<CreateCarResponse> result;
+    private CreateCarRequest request = new();
+    private bool loading;
+
+    private void Submit()
+    {
+        if (createCarValidation.ValidateAll())
+        {
+            CreateCarAsync();
+        }
+    }
+
+    private async void CreateCarAsync()
+    {
+        loading = true;
+        result = await CarService.CreateCarAsync(request);
+
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/cars/" + result.Data.CarId);
+        }
+
+        loading = false;
+        StateHasChanged();
+    }
+
+}

@@ -1,0 +1,86 @@
+@using CarCompanion.UI.Services.Interfaces
+@using CarCompanion.Shared.Results
+@using CarCompanion.Shared.Contract.V1.Responses.ShareCar
+
+@inject IShareKeyService ShareKeyService
+@inject NavigationManager NavigationManager
+
+<div class="d-flex justify-content-center">
+    <div class="p-5 m-3" style="background: white; width: 40%; border: #c9c9c9 1px solid; border-radius: 15px; ">
+        <div class="mb-4">
+            Use share key or <Button Color="Color.Primary" Clicked="@(async x => await ToggleForm.InvokeAsync())">click</Button> to create car
+        </div>
+        <Validations @ref="validations" Mode="ValidationMode.Manual">
+            <Validation Validator="@ValidateShareKey">
+                <TextEdit Placeholder="Share key">
+                    <Feedback>
+                        <ValidationNone>Please enter the share key</ValidationNone>
+                        <ValidationSuccess>Format of share key is good</ValidationSuccess>
+                        <ValidationError>Enter valid share key!</ValidationError>
+                    </Feedback>
+                </TextEdit>
+            </Validation>
+            <hr/>
+            <Button Color="Color.Primary" Clicked="@Submit">
+                @if (loading)
+                {
+                    <span class="spinner-border spinner-border-sm mr-1"></span>
+                }
+                Use share key
+            </Button>
+        </Validations>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<Task> ToggleForm { get; set; }
+    
+    private bool loading;
+    private Validations validations;
+    private string shareKey;
+    private ServiceResult<UseShareKeyResponse> result;
+
+    private void ValidateShareKey(ValidatorEventArgs eventArgs)
+    {
+        shareKey = Convert.ToString(eventArgs.Value);
+        if (string.IsNullOrEmpty(shareKey))
+        {
+            eventArgs.Status = ValidationStatus.None;
+            return;
+        }
+
+        try
+        {
+            Guid.Parse(shareKey);
+            eventArgs.Status = ValidationStatus.Success;
+        }
+        catch
+        {
+            eventArgs.Status = ValidationStatus.Error;
+        }
+    }
+
+    private void Submit()
+    {
+        if (validations.ValidateAll())
+        {
+            UseShareKeyAsync();
+        }
+    }
+
+    private async void UseShareKeyAsync()
+    {
+        loading = true;
+        result = await ShareKeyService.UseShareKeyAsync(shareKey);
+
+        if (result.Success)
+        {
+            NavigationManager.NavigateTo("/cars/" + result.Data.CarId);
+        }
+
+        loading = false;
+    }
+
+
+}

@@ -8,5 +8,6 @@ namespace CarCompanion.UI.Services.Interfaces
     public interface IShareKeyService
     {
         Task<ServiceResult<CreateShareKeyResponse>> GetShareKeyAsync(string carId, CreateShareKeyRequest request);
+        Task<ServiceResult<UseShareKeyResponse>> UseShareKeyAsync(string shareKey);
     }
 }

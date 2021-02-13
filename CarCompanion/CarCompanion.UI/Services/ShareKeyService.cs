@@ -9,7 +9,8 @@ namespace CarCompanion.UI.Services
 {
     public class ShareKeyService : IShareKeyService
     {
-        private const string Url = "http://localhost:8080/api/v1/cars/{0}/share";
+        private const string CreateShareKeyUrl = "http://localhost:8080/api/v1/cars/{0}/share";
+        private const string UseShareKeyUrl = "http://localhost:8080/api/v1/cars/use-sharekey/{0}";
         private readonly IRequestSenderService _requestSenderService;
         
         public ShareKeyService(IRequestSenderService requestSenderService)
@@ -17,10 +18,16 @@ namespace CarCompanion.UI.Services
             _requestSenderService = requestSenderService;
         }
         
-        public Task<ServiceResult<CreateShareKeyResponse>> GetShareKeyAsync(string carId, CreateShareKeyRequest request)
+        public async Task<ServiceResult<CreateShareKeyResponse>> GetShareKeyAsync(string carId, CreateShareKeyRequest request)
         {
-            var uri = string.Format(Url, carId);
-            return _requestSenderService.SendAuthPostRequestAsync<CreateShareKeyResponse>(uri, request);
+            var uri = string.Format(CreateShareKeyUrl, carId);
+            return await _requestSenderService.SendAuthPostRequestAsync<CreateShareKeyResponse>(uri, request);
+        }
+
+        public async Task<ServiceResult<UseShareKeyResponse>> UseShareKeyAsync(string shareKey)
+        {
+            var uri = string.Format(UseShareKeyUrl, shareKey);
+            return await _requestSenderService.SendAuthPostRequestAsync<UseShareKeyResponse>(uri);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CarCompanion.UI.Services.Interfaces;
 using Microsoft.AspNetCore.Components;
 using System;
+using System.Net;
 using CarCompanion.Shared.Results;
 
 namespace CarCompanion.UI.Services
@@ -38,10 +39,10 @@ namespace CarCompanion.UI.Services
                     {"Accept", "application/json"}
                 }
             };
-            
+
             return await SendRequest<T>(httpRequestMessage);
         }
-        
+
         public async Task<ServiceResult<T>> SendAuthPostRequestAsync<T>(string uri)
         {
             var accessToken = await _localStorageService.GetItem<string>("accessToken");
@@ -56,7 +57,7 @@ namespace CarCompanion.UI.Services
                     {"Accept", "application/json"}
                 }
             };
-            
+
             return await SendRequest<T>(httpRequestMessage);
         }
 
@@ -77,7 +78,7 @@ namespace CarCompanion.UI.Services
                 },
                 Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
             };
-            
+
             return await SendRequest<T>(httpRequestMessage);
         }
 
@@ -98,7 +99,7 @@ namespace CarCompanion.UI.Services
                 },
                 Content = new StringContent(jsonContent, Encoding.UTF8, "application/json")
             };
-            
+
             return await SendRequest<T>(httpRequestMessage);
         }
 
@@ -123,25 +124,26 @@ namespace CarCompanion.UI.Services
         private async Task<ServiceResult<T>> SendRequest<T>(HttpRequestMessage httpRequestMessage)
         {
             HttpResponseMessage response;
-            
+
             try
             {
-                response = await _httpClient.SendAsync(httpRequestMessage);    
-            }
-            catch
-            {
-                return new ServiceResult<T> {Success = false};
-            }
+                response = await _httpClient.SendAsync(httpRequestMessage);
 
-            if (!response.IsSuccessStatusCode)
+                if (response.StatusCode == HttpStatusCode.Unauthorized)
+                {
+                    _navigationManager.NavigateTo("logout");
+                    throw new Exception();
+                }
+                
+                if (!response.IsSuccessStatusCode) throw new Exception(await response.Content.ReadAsStringAsync());
+            }
+            catch(Exception e)
             {
-                _navigationManager.NavigateTo("logout");
-                return default;
+                return new ServiceResult<T> {Success = false, ErrorMessage = e.Message};
             }
 
             var data = await response.Content.ReadFromJsonAsync<T>();
             return new ServiceResult<T> {Success = true, Data = data};
         }
-
     }
 }

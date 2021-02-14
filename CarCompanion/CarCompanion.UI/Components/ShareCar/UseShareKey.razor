@@ -11,17 +11,20 @@
             Use share key or <Button Color="Color.Primary" Clicked="@(async x => await ToggleForm.InvokeAsync())">click</Button> to create car
         </div>
         <Validations @ref="validations" Mode="ValidationMode.Manual">
+            @if (errorMessage != null)
+            {
+                <span style="color: red;" class="mb-3">Errors: @errorMessage</span>
+            }
             <Validation Validator="@ValidateShareKey">
                 <TextEdit Placeholder="Share key">
                     <Feedback>
                         <ValidationNone>Please enter the share key</ValidationNone>
                         <ValidationSuccess>Format of share key is good</ValidationSuccess>
-                        <ValidationError>Enter valid share key!</ValidationError>
+                        <ValidationError>No proper format of share key!</ValidationError>
                     </Feedback>
                 </TextEdit>
             </Validation>
-            <hr/>
-            <Button Color="Color.Primary" Clicked="@Submit">
+            <Button Color="Color.Primary" Clicked="@Submit" class="mt-3">
                 @if (loading)
                 {
                     <span class="spinner-border spinner-border-sm mr-1"></span>
@@ -40,6 +43,7 @@
     private Validations validations;
     private string shareKey;
     private ServiceResult<UseShareKeyResponse> result;
+    private string errorMessage;
 
     private void ValidateShareKey(ValidatorEventArgs eventArgs)
     {
@@ -78,9 +82,9 @@
         {
             NavigationManager.NavigateTo("/cars/" + result.Data.CarId);
         }
-
+        
+        errorMessage = result.ErrorMessage;
         loading = false;
+        StateHasChanged();
     }
-
-
 }

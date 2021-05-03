@@ -21,7 +21,7 @@ Frontend:
 
 ## Installation
 
-Use the [docker and docker-compose](https://www.docker.com/) to run frontend and backend of the application.
+Be sure you have [docker and docker-compose](https://www.docker.com/) installed on your machine to run frontend and backend of the application.
 
 run this command in main repository folder:
 ```bash
